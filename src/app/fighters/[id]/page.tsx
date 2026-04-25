@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import TopBar from "@/components/TopBar";
 import { fighters, getGymById } from "@/lib/data";
 import Link from "next/link";
+import Image from "next/image";
 
 const styleColors: Record<string, string> = {
   Striker: "var(--red-500)", Grappler: "var(--blue-500)", Mixto: "var(--orange-500)",
@@ -42,13 +43,13 @@ export default function FighterDetailPage() {
         <div style={{ display: "flex", gap: 20, alignItems: "flex-start", position: "relative" }}>
           {/* Avatar */}
           <div style={{
-            width: 96, height: 96, borderRadius: 20, flexShrink: 0,
-            background: `linear-gradient(135deg, var(--red-800), var(--red-600))`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 34, color: "white",
-            border: "3px solid var(--color-primary)"
-          }}>{initials}</div>
-
+            width: 96, height: 96, flexShrink: 0, position: "relative", overflow: "hidden",
+            background: "var(--neutral-900)",
+            border: "4px solid var(--color-primary)",
+            boxShadow: "4px 4px 0px rgba(255,0,0,0.2)"
+          }}>
+            <Image src="/fighter-silhouette.png" alt={fighter.name} fill style={{ objectFit: "cover", objectPosition: "top left" }} />
+          </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
               <span className={`badge badge-${fighter.level === "Pro" ? "pro" : "amateur"}`}>{fighter.level} Verificado</span>
@@ -81,61 +82,61 @@ export default function FighterDetailPage() {
 
       <main style={{ padding: "20px 16px" }}>
         {/* Record cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
-          <div style={{ padding: "18px 16px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--card-border)" }}>
-            <div style={{ fontSize: 10, fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-muted)", marginBottom: 6 }}>Récord PRO</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div style={{ padding: "18px 16px", background: "var(--color-surface)", border: "2px solid var(--color-text)", position: "relative", boxShadow: "4px 4px 0px rgba(255,255,255,0.1)" }}>
+            <div style={{ fontSize: 10, fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", color: "var(--color-text-muted)", marginBottom: 6 }}>Récord PRO</div>
             <div className="record-display" style={{ fontSize: 28, marginBottom: 6 }}>
-              <span className="record-w">{p.w}</span>
+              <span className="record-w" style={{ fontFamily: "var(--font-display)" }}>{p.w}</span>
               <span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span>
-              <span className="record-l">{p.l}</span>
-              {p.d > 0 && <><span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span><span className="record-d">{p.d}</span></>}
+              <span className="record-l" style={{ fontFamily: "var(--font-display)" }}>{p.l}</span>
+              {p.d > 0 && <><span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span><span className="record-d" style={{ fontFamily: "var(--font-display)" }}>{p.d}</span></>}
             </div>
-            <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{winRate}% win rate</div>
+            <div style={{ fontSize: 11, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>{winRate}% win rate</div>
           </div>
-          <div style={{ padding: "18px 16px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--card-border)" }}>
-            <div style={{ fontSize: 10, fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-muted)", marginBottom: 6 }}>Récord AMATEUR</div>
+          <div style={{ padding: "18px 16px", background: "var(--color-surface)", border: "2px solid var(--color-border)" }}>
+            <div style={{ fontSize: 10, fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", color: "var(--color-text-muted)", marginBottom: 6 }}>Récord AMATEUR</div>
             <div className="record-display" style={{ fontSize: 28 }}>
-              <span className="record-w">{a.w}</span>
+              <span className="record-w" style={{ fontFamily: "var(--font-display)" }}>{a.w}</span>
               <span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span>
-              <span className="record-l">{a.l}</span>
-              {a.d > 0 && <><span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span><span className="record-d">{a.d}</span></>}
+              <span className="record-l" style={{ fontFamily: "var(--font-display)" }}>{a.l}</span>
+              {a.d > 0 && <><span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 20 }}>-</span><span className="record-d" style={{ fontFamily: "var(--font-display)" }}>{a.d}</span></>}
             </div>
-            <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fighter.age} años</div>
+            <div style={{ fontSize: 11, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>{fighter.age} años</div>
           </div>
         </div>
 
         {/* Stats grid */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginBottom: 20 }}>
           {[
-            { label: "Peso", value: `${fighter.weightLbs} lbs` },
-            { label: "Estatura", value: fighter.height },
+            { label: "Peso", value: `${fighter.weightLbs}` },
+            { label: "Est", value: fighter.height },
             { label: "Alcance", value: fighter.reach },
-            { label: "Ranking", value: `#${fighter.rank}` },
+            { label: "Rank", value: `#${fighter.rank}` },
           ].map(({ label, value }) => (
-            <div key={label} style={{ padding: "12px 10px", textAlign: "center", background: "var(--card-bg)", borderRadius: 12, border: "1px solid var(--card-border)" }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "var(--color-text)", marginBottom: 2 }}>{value}</div>
-              <div style={{ fontSize: 10, color: "var(--color-text-muted)", textTransform: "uppercase", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em" }}>{label}</div>
+            <div key={label} style={{ padding: "12px 6px", textAlign: "center", background: "var(--neutral-900)", border: "1px solid var(--color-border)" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 14, color: "white", marginBottom: 4 }}>{value}</div>
+              <div style={{ fontSize: 10, color: "var(--color-text-muted)", textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px" }}>{label}</div>
             </div>
           ))}
         </div>
 
         {/* Skill Profile */}
-        <div style={{ padding: "20px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--card-border)", marginBottom: 16 }}>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 16 }}>
-            Skill Profile · <span style={{ color: styleColors[fighter.style] }}>{fighter.style}</span>
+        <div style={{ padding: "20px", background: "var(--neutral-900)", border: "2px solid var(--color-border)", borderLeft: `6px solid ${styleColors[fighter.style] || "var(--color-border)"}`, marginBottom: 16 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 16, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 16 }}>
+            PERFIL TÁCTICO · <span style={{ color: styleColors[fighter.style] || "white" }}>{fighter.style}</span>
           </div>
           {[
-            { label: "Striking Power", value: fighter.strikingPower, icon: "👊" },
+            { label: "Striking", value: fighter.strikingPower, icon: "👊" },
             { label: "Grappling", value: fighter.grappling, icon: "🤼" },
-            { label: "Conditioning", value: fighter.conditioning, icon: "💪" },
+            { label: "Cardio", value: fighter.conditioning, icon: "💪" },
           ].map(({ label, value, icon }) => (
             <div key={label} style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{icon} {label}</span>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 13, color: value >= 90 ? "var(--color-primary)" : "var(--color-text-secondary)" }}>{value}</span>
+                <span style={{ fontSize: 13, color: "var(--color-text-secondary)", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>{icon} {label}</span>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 14, color: value >= 90 ? "var(--color-primary)" : "white" }}>{value}</span>
               </div>
-              <div className="progress-bar" style={{ height: 6 }}>
-                <div className="progress-fill" style={{ width: `${value}%` }} />
+              <div className="progress-bar" style={{ height: 8, background: "rgba(255,255,255,0.05)" }}>
+                <div className="progress-fill" style={{ width: `${value}%`, background: value >= 90 ? "var(--color-primary)" : "var(--color-border)" }} />
               </div>
             </div>
           ))}
@@ -143,13 +144,12 @@ export default function FighterDetailPage() {
 
         {/* Achievements */}
         {fighter.achievements.length > 0 && (
-          <div style={{ padding: "20px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--card-border)", marginBottom: 16 }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>🏆 Logros</div>
+          <div style={{ padding: "20px", background: "var(--neutral-900)", border: "2px solid var(--color-border)", marginBottom: 16 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 16, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 14 }}>🏆 PALMARÉS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {fighter.achievements.map((ach, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "var(--color-surface-raised)", borderRadius: 10 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-primary)", flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{ach}</span>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "rgba(255,255,255,0.05)", borderLeft: "2px solid var(--yellow-500)" }}>
+                  <span style={{ fontSize: 13, color: "white", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>{ach}</span>
                 </div>
               ))}
             </div>
@@ -158,24 +158,24 @@ export default function FighterDetailPage() {
 
         {/* Fight history */}
         {fighter.fightHistory.length > 0 && (
-          <div style={{ padding: "20px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--card-border)", marginBottom: 16 }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>⚔️ Historial de Peleas</div>
+          <div style={{ padding: "20px", background: "var(--neutral-900)", border: "2px solid var(--color-border)", borderLeft: "4px solid var(--color-text)", marginBottom: 16 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 16, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 14 }}>⚔️ HISTORIAL SANGRIENTO</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {fighter.fightHistory.map((fight, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", background: "var(--color-surface-raised)", borderRadius: 12 }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", background: "var(--color-bg)", border: "1px solid var(--color-border)" }}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: "50%",
-                    background: fight.result === "W" ? "rgba(34,197,94,0.15)" : fight.result === "L" ? "rgba(239,68,68,0.15)" : "rgba(156,163,175,0.15)",
+                    width: 36, height: 36,
+                    background: fight.result === "W" ? "var(--record-win)" : fight.result === "L" ? "var(--record-loss)" : "var(--record-draw)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 14,
-                    color: fight.result === "W" ? "var(--record-win)" : fight.result === "L" ? "var(--record-loss)" : "var(--record-draw)",
+                    color: "white",
                     flexShrink: 0
                   }}>{fight.result}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14 }}>vs {fight.opponent}</div>
-                    <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{fight.method} · {fight.event}</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 14, textTransform: "uppercase" }}>VS {fight.opponent}</div>
+                    <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-body)", textTransform: "uppercase" }}>{fight.method} · {fight.event}</div>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--color-text-muted)", textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: "var(--color-text-muted)", textAlign: "right", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>
                     {new Date(fight.date).toLocaleDateString("es-EC", { month: "short", year: "numeric" })}
                   </div>
                 </div>
