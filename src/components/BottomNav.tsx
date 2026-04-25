@@ -109,25 +109,31 @@ export default function BottomNav({ role = "normal" }: BottomNavProps) {
         {items.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
-            <Link key={href} href={href} onClick={() => !active && startLoading("CARGANDO SECTOR...")} style={{
-              textDecoration: "none", display: "flex", flexDirection: "column",
+            <div key={href} onClick={() => {
+              if (!active) {
+                startLoading("CARGANDO SECTOR...");
+                router.push(href);
+              }
+            }} style={{
+              cursor: "pointer", display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center", gap: 3,
               padding: "10px 2px 10px", position: "relative",
               color: active ? "var(--color-primary)" : "rgba(255,255,255,0.35)",
-              transition: "color 0.2s",
+              transition: "color 0.2s, background 0.2s",
+              background: active ? "rgba(255,0,0,0.05)" : "transparent"
             }}>
+              {/* Active top line - Brutalist rigid */}
               {active && (
                 <div style={{
-                  position: "absolute", top: 0, left: "20%", right: "20%",
-                  height: 2, background: "var(--color-primary)",
-                  borderRadius: "0 0 2px 2px", boxShadow: "0 0 8px var(--color-primary)",
+                  position: "absolute", top: -1, left: 0, right: 0,
+                  height: 4, background: "var(--color-primary)"
                 }} />
               )}
               <Icon />
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: active ? 700 : 500, fontSize: 9, textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1 }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 10, textTransform: "uppercase", letterSpacing: "1px", lineHeight: 1 }}>
                 {label}
               </span>
-            </Link>
+            </div>
           );
         })}
       </div>
