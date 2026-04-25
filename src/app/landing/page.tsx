@@ -2,6 +2,32 @@
 import Link from "next/link";
 import Image from "next/image";
 import { fighters, gyms } from "@/lib/data";
+import { useState, useEffect } from "react";
+
+const GLITCH_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+=-_<>[]{}";
+function GlitchText({ text }: { text: string }) {
+  const [displayText, setDisplayText] = useState("");
+  
+  useEffect(() => {
+    let iteration = 0;
+    const interval = setInterval(() => {
+      setDisplayText(text.split("").map((letter, index) => {
+        if (letter === " ") return " ";
+        if (index < iteration) return letter;
+        return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+      }).join(""));
+      
+      if (iteration >= text.length) clearInterval(interval);
+      iteration += 1 / 2; // Speed of decoding
+    }, 40);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return <span style={{ position: "relative", display: "inline-block" }}>
+    {displayText}
+    {displayText.length < text.length && <span style={{ position: "absolute", right: -12, top: 0, bottom: 0, width: 8, background: "var(--color-primary)", animation: "blink 1s step-end infinite" }} />}
+  </span>;
+}
 
 export default function LandingPage() {
   const top3 = fighters.filter(f => f.level === "Pro").sort((a,b) => a.rank - b.rank).slice(0, 3);
@@ -65,7 +91,9 @@ export default function LandingPage() {
         {/* Left: Huge Brutalist Text */}
         <div className="animate-pulse-slow" style={{ flex: "1 1 500px", zIndex: 10 }}>
           <div style={{ display: "inline-block", background: "var(--color-text)", color: "var(--color-bg)", padding: "4px 12px", fontFamily: "var(--font-display)", fontSize: 20, letterSpacing: "2px", transform: "skewX(-10deg)", marginBottom: 20 }}>
-            <span style={{ transform: "skewX(10deg)", display: "block" }}>LA CALLE ES DIGITAL</span>
+            <span style={{ transform: "skewX(10deg)", display: "block" }}>
+               <GlitchText text="LA CALLE ES DIGITAL" />
+            </span>
           </div>
           <h1 style={{ 
             fontFamily: "var(--font-display)", fontSize: "clamp(60px, 12vw, 130px)", 

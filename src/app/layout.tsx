@@ -10,8 +10,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="es">
@@ -27,7 +29,10 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <GlobalLoader />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          {modal}
+        </AuthProvider>
       </body>
     </html>
   );
