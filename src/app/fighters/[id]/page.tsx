@@ -7,6 +7,9 @@ import FighterProfile from "@/components/FighterProfile";
 
 export default function FighterDetailPage() {
   const params = useParams<{ id: string }>();
+  
+  if (!params?.id) return null;
+  
   const fighter = fighters.find((f) => f.id === params.id);
   if (!fighter) notFound();
 

@@ -7,6 +7,9 @@ import GymProfile from "@/components/GymProfile";
 
 export default function GymDetailPage() {
   const params = useParams<{ id: string }>();
+  
+  if (!params?.id) return null;
+  
   const gym = gyms.find((g) => g.id === params.id);
   if (!gym) notFound();
 

@@ -3,8 +3,9 @@ import { fighters } from "@/lib/data";
 import BrutalistModal from "@/components/BrutalistModal";
 import FighterProfile from "@/components/FighterProfile";
 
-export default function FighterIntercept({ params }: { params: { id: string } }) {
-  const fighter = fighters.find((f) => f.id === params.id);
+export default async function FighterIntercept({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const fighter = fighters.find((f) => f.id === resolvedParams.id);
   if (!fighter) notFound();
 
   return (
