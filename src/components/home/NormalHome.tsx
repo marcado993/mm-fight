@@ -95,13 +95,49 @@ export default function NormalHome({ user }: { user: UserProfile }) {
           </div>
 
           {/* Action Buttons row */}
-          <div style={{ display: "flex", position: "relative", zIndex: 100 }}>
+          <div style={{ display: "flex", position: "relative", zIndex: 100, borderTop: "4px solid var(--color-text)" }}>
              <button onClick={() => setShowTicketModal(true)} className="animate-jab" style={{ flex: 1, background: "var(--color-primary)", color: "white", padding: "16px 8px", border: "none", fontFamily: "var(--font-display)", fontSize: "clamp(16px, 4vw, 24px)", textTransform: "uppercase", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderRight: "4px solid var(--color-text)", lineHeight: 1.1 }}>
                COMPRAR<br/>ENTRADAS
              </button>
              <button className="animate-jab" style={{ flex: 1, background: "var(--neutral-900)", color: "white", padding: "16px", border: "none", fontFamily: "var(--font-display)", fontSize: "clamp(16px, 4vw, 24px)", textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer" }}>
                ▶ VER PPV
              </button>
+          </div>
+
+          {/* ECOS DE LA JAULA / TRASH TALK */}
+          <div style={{ background: "var(--neutral-900)", padding: "16px 20px", borderTop: "4px solid var(--color-text)" }}>
+             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 18 }}>🔥</span>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "1px" }}>
+                   ECOS DE LA JAULA
+                </div>
+             </div>
+             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ background: "rgba(255,255,255,0.05)", padding: "12px", borderLeft: "4px solid var(--color-primary)" }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <span style={{ fontSize: 12, fontFamily: "var(--font-display)", color: "white", textTransform: "uppercase" }}>{name1}</span>
+                      <span style={{ fontSize: 10, color: "var(--color-text-muted)" }}>Hace 2h</span>
+                   </div>
+                   <div style={{ fontSize: 13, color: "var(--color-text-secondary)", fontStyle: "italic" }}>"Esta vez no vas a pasar del primer round. Te voy a arrancar la cabeza."</div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.05)", padding: "12px", borderRight: "4px solid var(--blue-500)", textAlign: "right" }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4, flexDirection: "row-reverse" }}>
+                      <span style={{ fontSize: 12, fontFamily: "var(--font-display)", color: "white", textTransform: "uppercase" }}>{name2}</span>
+                      <span style={{ fontSize: 10, color: "var(--color-text-muted)" }}>Hace 1h</span>
+                   </div>
+                   <div style={{ fontSize: 13, color: "var(--color-text-secondary)", fontStyle: "italic" }}>"Hablas mucho para alguien que corrió toda la pelea pasada. Nos vemos al centro."</div>
+                </div>
+             </div>
+             {user.role === "fighter" ? (
+               <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+                  <input type="text" placeholder="Añadir leña al fuego (Solo Peleadores)..." style={{ flex: 1, padding: "10px 12px", background: "black", border: "1px solid var(--color-border)", color: "white", fontSize: 12, fontFamily: "var(--font-body)", outline: "none", borderRadius: 0 }} />
+                  <button className="btn-primary" style={{ padding: "8px 16px", fontSize: 11, border: "2px solid var(--color-primary)" }}>ENVIAR</button>
+               </div>
+             ) : (
+               <div style={{ marginTop: 16, fontSize: 11, color: "var(--color-text-muted)", textAlign: "center", textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px", background: "rgba(0,0,0,0.4)", padding: "8px" }}>
+                 [ Solo peleadores verificados pueden tirar beef ]
+               </div>
+             )}
           </div>
         </div>
         )

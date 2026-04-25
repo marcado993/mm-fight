@@ -38,7 +38,7 @@ export default function GlobalLoader() {
           animation: "pulse-impact 1s infinite",
           background: "black"
         }}>
-          <Image src="/loader-icon.png" width={56} height={56} alt="Loading" className="animate-spin" style={{ animationDuration: "3s" }} />
+          <Image src="/loader-icon.png" width={56} height={56} alt="Loading" />
         </div>
         
         {/* Brutalist text */}
