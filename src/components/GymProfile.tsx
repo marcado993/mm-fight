@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Gym, getFightersByGym, gyms } from "@/lib/data";
 import FighterCard from "@/components/FighterCard";
+import { useAuth } from "@/lib/auth";
 
 export default function GymProfile({ gym }: { gym: Gym }) {
+  const { user } = useAuth();
   const roster = getFightersByGym(gym.id);
   const rivalGym = gym.rivalry ? gyms.find(g => g.id === gym.rivalry) : null;
   const winRate = gym.totalWins + gym.totalLosses > 0
@@ -131,14 +133,16 @@ export default function GymProfile({ gym }: { gym: Gym }) {
         </div>
 
         {/* CTA */}
-        <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr" }}>
-          <Link href="/matchmaking" style={{ textDecoration: "none" }}>
-            <button className="btn-primary hover-lift" style={{ width: "100%", padding: "18px", fontSize: 16, border: "2px solid var(--color-primary)", background: "var(--color-primary)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px" }}>
-              <div style={{ width: 12, height: 12, background: "white", transform: "rotate(45deg)" }} />
-              RETAR AL GYM
-            </button>
-          </Link>
-        </div>
+        {user?.role && user.role !== "normal" && (
+          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr" }}>
+            <Link href="/matchmaking" style={{ textDecoration: "none" }}>
+              <button className="btn-primary hover-lift" style={{ width: "100%", padding: "18px", fontSize: 16, border: "2px solid var(--color-primary)", background: "var(--color-primary)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px" }}>
+                <div style={{ width: 12, height: 12, background: "white", transform: "rotate(45deg)" }} />
+                RETAR AL GYM
+              </button>
+            </Link>
+          </div>
+        )}
       </main>
     </>
   );

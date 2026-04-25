@@ -2,12 +2,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Fighter, getGymById } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
 
 const styleColors: Record<string, string> = {
   Striker: "var(--red-500)", Grappler: "var(--blue-500)", Mixto: "var(--orange-500)",
 };
 
 export default function FighterProfile({ fighter }: { fighter: Fighter }) {
+  const { user } = useAuth();
   const gym = getGymById(fighter.gymId);
   const p = fighter.proRecord;
   const a = fighter.amateurRecord;
@@ -147,14 +149,16 @@ export default function FighterProfile({ fighter }: { fighter: Fighter }) {
         )}
 
         {/* CTA */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
-          <Link href="/matchmaking" style={{ textDecoration: "none" }}>
-            <button className="btn-primary hover-lift" style={{ width: "100%", padding: "18px", fontSize: 16, border: "2px solid var(--color-primary)", background: "var(--color-primary)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px" }}>
-              <div style={{ width: 12, height: 12, background: "white", transform: "rotate(45deg)" }} />
-              RETAR
-            </button>
-          </Link>
-        </div>
+        {user?.role === "fighter" && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
+            <Link href="/matchmaking" style={{ textDecoration: "none" }}>
+              <button className="btn-primary hover-lift" style={{ width: "100%", padding: "18px", fontSize: 16, border: "2px solid var(--color-primary)", background: "var(--color-primary)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px" }}>
+                <div style={{ width: 12, height: 12, background: "white", transform: "rotate(45deg)" }} />
+                RETAR
+              </button>
+            </Link>
+          </div>
+        )}
       </main>
     </>
   );

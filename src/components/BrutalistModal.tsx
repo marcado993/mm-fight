@@ -45,6 +45,13 @@ export default function BrutalistModal({ children }: { children: React.ReactNode
           from { transform: scale(0.95); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
+        .modal-close-strip {
+          background: #111; color: var(--color-text-muted);
+          transition: background 0.2s, color 0.2s;
+        }
+        .modal-close-strip:hover {
+          background: var(--red-700); color: white;
+        }
       `}</style>
       
       {/* Click outside to close */}
@@ -52,15 +59,18 @@ export default function BrutalistModal({ children }: { children: React.ReactNode
 
       <div className="modal-content">
         {/* Close Strip */}
-        <div onClick={() => router.back()} className="hover-lift" style={{
-          position: "sticky", top: 0, right: 0, width: "100%", padding: "16px",
-          background: "black", borderBottom: "2px solid var(--color-border)",
-          color: "white", fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 13,
-          textTransform: "uppercase", letterSpacing: "2px", display: "flex", justifyContent: "center", alignItems: "center",
-          gap: 10, zIndex: 10, cursor: "pointer"
+        <div onClick={() => router.back()} className="modal-close-strip" style={{
+          position: "sticky", top: 0, right: 0, width: "100%", padding: "16px 20px",
+          borderBottom: "2px solid var(--color-border)",
+          fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 13,
+          textTransform: "uppercase", letterSpacing: "2px", display: "flex", justifyContent: "space-between", alignItems: "center",
+          zIndex: 10, cursor: "pointer"
         }}>
-          <div style={{ width: 12, height: 12, background: "var(--color-primary)", transform: "rotate(45deg)" }} />
-          CERRAR PANEL
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 12, height: 12, background: "currentColor", transform: "rotate(45deg)", transition: "background 0.2s" }} className="close-diamond" />
+            <span className="hidden md:inline">PRESIONA [ ESC ] O DA CLICK PARA </span>CERRAR PANEL
+          </div>
+          <div style={{ fontSize: 24, lineHeight: 1 }}>✕</div>
         </div>
         
         {/* Child Content */}
