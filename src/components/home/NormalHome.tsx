@@ -104,38 +104,62 @@ export default function NormalHome({ user }: { user: UserProfile }) {
              </button>
           </div>
 
-          {/* ECOS DE LA JAULA / TRASH TALK */}
-          <div style={{ background: "var(--neutral-900)", padding: "16px 20px", borderTop: "4px solid var(--color-text)" }}>
-             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <span style={{ fontSize: 18 }}>🔥</span>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "1px" }}>
+          {/* ECOS DE LA JAULA / TRASH TALK (UPGRADED) */}
+          <div style={{ background: "var(--color-bg)", padding: "24px 16px", borderTop: "4px solid var(--color-primary)", position: "relative", overflow: "hidden" }}>
+             {/* Giant background text */}
+             <div style={{ position: "absolute", top: -10, right: -10, fontSize: 100, fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.03)", lineHeight: 1, pointerEvents: "none" }}>BEEF</div>
+             
+             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24, position: "relative", zIndex: 1 }}>
+                <div style={{ width: 6, height: 20, background: "var(--color-primary)", transform: "skewX(-15deg)" }} />
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "white", textTransform: "uppercase", letterSpacing: "2px" }}>
                    ECOS DE LA JAULA
                 </div>
              </div>
-             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ background: "rgba(255,255,255,0.05)", padding: "12px", borderLeft: "4px solid var(--color-primary)" }}>
-                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <span style={{ fontSize: 12, fontFamily: "var(--font-display)", color: "white", textTransform: "uppercase" }}>{name1}</span>
-                      <span style={{ fontSize: 10, color: "var(--color-text-muted)" }}>Hace 2h</span>
+
+             <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "relative", zIndex: 1 }}>
+                {/* Fighter 1 Quote */}
+                <div style={{ alignSelf: "flex-start", width: "95%", position: "relative" }}>
+                   <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+                      <div style={{ width: 48, height: 48, border: "2px solid var(--color-primary)", background: "var(--neutral-900)", flexShrink: 0, position: "relative", overflow: "hidden" }}>
+                         <Image src="/fighter-silhouette.png" alt={name1} fill style={{ objectFit: "cover", objectPosition: "top left" }} />
+                      </div>
+                      <div style={{ flex: 1, background: "rgba(15,15,15,0.9)", padding: "12px 16px", position: "relative", clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)", borderLeft: "4px solid var(--color-primary)" }}>
+                         <span style={{ position: "absolute", top: 4, right: 8, fontSize: 36, fontFamily: "serif", color: "rgba(255,255,255,0.06)", lineHeight: 1 }}>&ldquo;</span>
+                         <div style={{ fontSize: 10, fontFamily: "var(--font-display)", color: "var(--color-primary)", textTransform: "uppercase", marginBottom: 4, letterSpacing: "1px" }}>{name1} · HACE 2H</div>
+                         <div style={{ fontSize: 13, color: "white", fontStyle: "italic", fontWeight: 600, lineHeight: 1.4 }}>
+                            "TE VOY A REVENTAR LA CHUCHI TÍO. NO VAS A PASAR DEL PRIMER ROUND."
+                         </div>
+                      </div>
                    </div>
-                   <div style={{ fontSize: 13, color: "var(--color-text-secondary)", fontStyle: "italic" }}>"Esta vez no vas a pasar del primer round. Te voy a arrancar la cabeza."</div>
                 </div>
-                <div style={{ background: "rgba(255,255,255,0.05)", padding: "12px", borderRight: "4px solid var(--blue-500)", textAlign: "right" }}>
-                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4, flexDirection: "row-reverse" }}>
-                      <span style={{ fontSize: 12, fontFamily: "var(--font-display)", color: "white", textTransform: "uppercase" }}>{name2}</span>
-                      <span style={{ fontSize: 10, color: "var(--color-text-muted)" }}>Hace 1h</span>
+
+                {/* Fighter 2 Quote */}
+                <div style={{ alignSelf: "flex-end", width: "95%", position: "relative" }}>
+                   <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexDirection: "row-reverse" }}>
+                      <div style={{ width: 48, height: 48, border: "2px solid var(--blue-500)", background: "var(--neutral-900)", flexShrink: 0, position: "relative", overflow: "hidden", transform: "scaleX(-1)" }}>
+                         <Image src="/fighter-silhouette.png" alt={name2} fill style={{ objectFit: "cover", objectPosition: "top left" }} />
+                      </div>
+                      <div style={{ flex: 1, background: "rgba(15,15,15,0.9)", padding: "12px 16px", position: "relative", clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))", borderRight: "4px solid var(--blue-500)", textAlign: "right" }}>
+                         <span style={{ position: "absolute", top: 4, left: 8, fontSize: 36, fontFamily: "serif", color: "rgba(255,255,255,0.06)", lineHeight: 1 }}>&ldquo;</span>
+                         <div style={{ fontSize: 10, fontFamily: "var(--font-display)", color: "var(--blue-500)", textTransform: "uppercase", marginBottom: 4, letterSpacing: "1px" }}>{name2} · HACE 1H</div>
+                         <div style={{ fontSize: 13, color: "white", fontStyle: "italic", fontWeight: 600, lineHeight: 1.4 }}>
+                            "ESTÁS MUERTO. HABLAS MUCHO PARA ALGUIEN QUE CORRIÓ TODA LA PELEA PASADA."
+                         </div>
+                      </div>
                    </div>
-                   <div style={{ fontSize: 13, color: "var(--color-text-secondary)", fontStyle: "italic" }}>"Hablas mucho para alguien que corrió toda la pelea pasada. Nos vemos al centro."</div>
                 </div>
              </div>
+
              {user.role === "fighter" ? (
-               <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-                  <input type="text" placeholder="Añadir leña al fuego (Solo Peleadores)..." style={{ flex: 1, padding: "10px 12px", background: "black", border: "1px solid var(--color-border)", color: "white", fontSize: 12, fontFamily: "var(--font-body)", outline: "none", borderRadius: 0 }} />
-                  <button className="btn-primary" style={{ padding: "8px 16px", fontSize: 11, border: "2px solid var(--color-primary)" }}>ENVIAR</button>
+               <div style={{ marginTop: 24, display: "flex", position: "relative", zIndex: 1, boxShadow: "4px 4px 0px rgba(255,0,0,0.1)" }}>
+                  <input type="text" placeholder="SOLO PELEADORES: TIRA BEEF AQUÍ..." style={{ flex: 1, padding: "12px 14px", background: "black", border: "2px solid var(--neutral-800)", borderRight: "none", color: "white", fontSize: 11, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px", outline: "none", borderRadius: 0 }} />
+                  <button className="btn-primary hover-lift" style={{ padding: "0 20px", fontSize: 13, border: "2px solid var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  </button>
                </div>
              ) : (
-               <div style={{ marginTop: 16, fontSize: 11, color: "var(--color-text-muted)", textAlign: "center", textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "1px", background: "rgba(0,0,0,0.4)", padding: "8px" }}>
-                 [ Solo peleadores verificados pueden tirar beef ]
+               <div style={{ marginTop: 20, fontSize: 10, color: "var(--color-primary)", textAlign: "center", textTransform: "uppercase", fontFamily: "var(--font-display)", letterSpacing: "2px", background: "rgba(255,0,0,0.05)", padding: "10px", border: "1px solid rgba(255,0,0,0.2)" }}>
+                 [ SOLO PELEADORES VERIFICADOS PUEDEN INTERVENIR ]
                </div>
              )}
           </div>

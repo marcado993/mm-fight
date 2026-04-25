@@ -1,27 +1,33 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useStore } from "@/lib/store";
 import Image from "next/image";
 
-export default function GlobalLoader() {
-  const { isLoading, message, stopLoading } = useStore();
+function RouteListener() {
+  const { stopLoading } = useStore();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Clear loading state on route change completion
   useEffect(() => {
-    // Artificial small delay to make the brutal animation visible
-    const timer = setTimeout(() => {
-      stopLoading();
-    }, 400);
+    const timer = setTimeout(() => stopLoading(), 400);
     return () => clearTimeout(timer);
   }, [pathname, searchParams, stopLoading]);
 
-  if (!isLoading) return null;
+  return null;
+}
+
+export default function GlobalLoader() {
+  const { isLoading, message } = useStore();
 
   return (
-    <div style={{
+    <>
+      <Suspense fallback={null}>
+        <RouteListener />
+      </Suspense>
+    
+      {isLoading && (
+        <div style={{
       position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: 99999,
       background: "rgba(10, 10, 10, 0.5)",
       backdropFilter: "blur(6px)",
@@ -51,5 +57,7 @@ export default function GlobalLoader() {
         </div>
       </div>
     </div>
+    )}
+    </>
   );
 }
