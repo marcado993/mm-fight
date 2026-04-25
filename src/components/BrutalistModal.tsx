@@ -16,28 +16,43 @@ export default function BrutalistModal({ children }: { children: React.ReactNode
   if (!mounted) return null;
 
   return (
-    <div style={{
+    <div className="modal-backdrop" style={{
       position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(4px)",
-      display: "flex", justifyContent: "center", alignItems: "flex-end",
+      display: "flex", justifyContent: "center",
     }}>
       <style>{`
+        .modal-backdrop { align-items: flex-end; }
+        .modal-content {
+          width: 100%; max-width: 640px; height: 85vh; overflow-y: auto;
+          background: var(--color-bg); border-top: 4px solid var(--color-primary);
+          box-shadow: 0 -20px 60px rgba(255,0,0,0.15);
+          animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+        }
+        @media (min-width: 768px) {
+          .modal-backdrop { align-items: center; }
+          .modal-content {
+            border: 4px solid var(--color-primary); height: 85vh; max-height: 800px;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 16px 16px 0px rgba(255,0,0,0.2);
+          }
+        }
         @keyframes slideUp { 
           from { transform: translateY(100%); opacity: 0.5; } 
           to { transform: translateY(0); opacity: 1; } 
+        }
+        @keyframes popIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
         }
       `}</style>
       
       {/* Click outside to close */}
       <div style={{ position: "absolute", inset: 0 }} onClick={() => router.back()} />
 
-      <div style={{
-        position: "relative", width: "100%", maxWidth: 640, height: "85vh", overflowY: "auto",
-        background: "var(--color-bg)", borderTop: "4px solid var(--color-primary)",
-        boxShadow: "0 -20px 60px rgba(255,0,0,0.15)",
-        animation: "slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-      }}>
+      <div className="modal-content">
         {/* Close Strip */}
-        <div onClick={() => router.back()} style={{
+        <div onClick={() => router.back()} className="hover-lift" style={{
           position: "sticky", top: 0, right: 0, width: "100%", padding: "16px",
           background: "black", borderBottom: "2px solid var(--color-border)",
           color: "white", fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 13,
