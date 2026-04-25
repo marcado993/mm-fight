@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { useStore } from "@/lib/store";
 import type { UserRole } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -87,6 +89,7 @@ interface BottomNavProps {
 
 export default function BottomNav({ role = "normal" }: BottomNavProps) {
   const pathname = usePathname();
+  const startLoading = useStore(state => state.startLoading);
   const { logout } = useAuth();
   const router = useRouter();
   const items = NAV_ITEMS[role];
@@ -106,7 +109,7 @@ export default function BottomNav({ role = "normal" }: BottomNavProps) {
         {items.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
-            <Link key={href} href={href} style={{
+            <Link key={href} href={href} onClick={() => !active && startLoading("CARGANDO SECTOR...")} style={{
               textDecoration: "none", display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center", gap: 3,
               padding: "10px 2px 10px", position: "relative",

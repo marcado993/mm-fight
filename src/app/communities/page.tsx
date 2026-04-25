@@ -1,106 +1,154 @@
 "use client";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AppShell from "@/components/AppShell";
-import { provincialLeagues } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
 import Image from "next/image";
 
+interface Comment {
+  id: string;
+  authorName: string;
+  authorRole: string;
+  content: string;
+  timestamp: string;
+  likes: number;
+}
+
+const initialComments: Comment[] = [
+  {
+    id: "c1",
+    authorName: "Kevin 'El Loco' Rojas",
+    authorRole: "Fighter",
+    content: "¡Alguien para guantear este viernes en la noche? Preferiblemente peso ligero, vamos a sumar rounds pesados. 🥊🔥",
+    timestamp: "Hace 2 horas",
+    likes: 14,
+  },
+  {
+    id: "c2",
+    authorName: "Team Oyama",
+    authorRole: "Gym",
+    content: "Acabamos de subir los horarios de lucha olímpica para este fin de mes. Todos los cinturones son bienvenidos a la colisión.",
+    timestamp: "Hace 5 horas",
+    likes: 32,
+  },
+  {
+    id: "c3",
+    authorName: "Carlos 'La Sombra' Viteri",
+    authorRole: "Fighter",
+    content: "Las tarjetas de los jueces de ayer fueron un robo. Si ganas corriendo tres rounds completos, no eres un peleador. Hay niveles.",
+    timestamp: "Ayer",
+    likes: 89,
+  }
+];
+
 export default function CommunitiesPage() {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
+  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [newComment, setNewComment] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!isLoading && !user) router.replace("/landing");
-  }, [user, isLoading, router]);
+  const roleColors: Record<string, string> = { "Fan": "var(--blue-500)", "Fighter": "var(--color-primary)", "Gym": "var(--orange-500)" };
 
-  if (isLoading || !user) return null;
-
-  const feed = [
-    { icon: <Image src="/icon_swords.png" width={24} height={24} alt="Swords" />, color: "var(--color-primary)",  province: "Guayas",     text: "ANDRÉS SILVA RETÓ A DIEGO ALMEIDA", sub: "Hace 2 horas" },
-    { icon: <Image src="/icon_trophy.png" width={24} height={24} alt="Trophy" />, color: "var(--green-500)",        province: "Pichincha",  text: "SEBASTIÁN REYES MANTIENE INVICTO AMATEUR", sub: "Hace 5 horas" },
-    { icon: <Image src="/icon_fire.png" width={24} height={24} alt="News" />,     color: "var(--yellow-500)",       province: "Manabí",     text: "WARRIOR SERIES 05 CONFIRMA CARTELERA COMPLETA", sub: "Ayer" },
-    { icon: <Image src="/icon_stadium.png" width={24} height={24} alt="Rank" />,  color: "var(--orange-500)",       province: "Azuay",      text: "CARLOS MORÁN SUBE AL #1 LIGA AZUAY", sub: "Hace 2 días" },
-    { icon: <Image src="/icon_stadium.png" width={24} height={24} alt="Venue" />, color: "var(--blue-500)",         province: "El Oro",     text: "NUEVO GIMNASIO SE UNE A LA LIGA EL ORO", sub: "Hace 3 días" },
-  ];
+  const handlePost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !user) return;
+    
+    const roleLabel = user.role === "fighter" ? "Fighter" : user.role === "gym" ? "Gym" : "Fan";
+    
+    const comment: Comment = {
+      id: Date.now().toString(),
+      authorName: user.name,
+      authorRole: roleLabel,
+      content: newComment,
+      timestamp: "Justo ahora",
+      likes: 0,
+    };
+    
+    setComments([comment, ...comments]);
+    setNewComment("");
+  };
 
   return (
-    <AppShell role={user.role}>
-      <main style={{ padding: "40px 16px 40px" }}>
+    <AppShell role={user?.role || "normal"}>
+      <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 70px)", background: "transparent" }}>
         
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontSize: 48, letterSpacing: "2px", lineHeight: 1, textTransform: "uppercase", marginBottom: 8 }}>
-            <Image src="/icon_fire.png" alt="Ligas" width={48} height={48} />
-            COMUNIDADES
-          </h1>
-          <p style={{ fontSize: 16, color: "var(--color-primary)", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>
-            CONÉCTATE CON TU FACCIÓN PROVINCIAL
-          </p>
-        </div>
+        {/* Header */}
+        <header style={{ padding: "20px clamp(16px, 4vw, 32px)", borderBottom: "4px solid var(--color-primary)", background: "var(--color-surface)", display: "flex", alignItems: "center", gap: 16 }}>
+           <div style={{ width: 48, height: 48, background: "var(--neutral-900)", border: "2px solid var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontSize: 24, color: "var(--color-primary)" }}>
+             🗣️
+           </div>
+           <div>
+             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(24px, 5vw, 36px)", textTransform: "uppercase", letterSpacing: "1px", lineHeight: 1 }}>Fosa Común</h1>
+             <p style={{ fontSize: 13, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>LA RED CERO FILTROS DEL MMA ECUATORIANO</p>
+           </div>
+        </header>
 
-        {/* Leagues grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 16, marginBottom: 48 }}>
-          {provincialLeagues.map(league => (
-            <div key={league.id} style={{ 
-              padding: "20px", cursor: "pointer", background: league.color, 
-              border: "4px solid var(--color-text)", boxShadow: "4px 4px 0px var(--neutral-900)" 
+        {/* Input Box for making Comments */}
+        <div style={{ padding: "20px clamp(16px, 4vw, 32px)", background: "var(--neutral-900)", borderBottom: "1px solid var(--color-border)" }}>
+          <form onSubmit={handlePost} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+            <div style={{
+              width: 50, height: 50, flexShrink: 0, position: "relative", overflow: "hidden",
+              border: `2px solid var(--color-primary)`, background: "var(--neutral-800)"
             }}>
-              <div style={{ fontSize: 40, marginBottom: 12, filter: "grayscale(100%) brightness(200%)" }}>{league.icon}</div>
-              <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginBottom: 8, color: "white", textTransform: "uppercase", textShadow: "1px 1px 0px black" }}>{league.name}</div>
-              <div style={{ fontSize: 12, color: "black", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase", background: "white", padding: "4px 8px", display: "inline-block", marginBottom: 12 }}>
-                {league.activeFighters} PELEADORES // {league.gyms} GYMS
-              </div>
-              {league.champion && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--yellow-400)", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase", backgroundColor: "rgba(0,0,0,0.4)", padding: "4px", marginBottom: 8 }}>
-                  <Image src="/icon_trophy.png" width={16} height={16} alt="Trophy" />
-                  REY: {league.champion}
-                </div>
-              )}
-              {league.nextEvent && (
-                <div style={{ fontSize: 12, color: "white", marginTop: 8, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>
-                  PRÓXIMA GUERRA: {new Date(league.nextEvent).toLocaleDateString("es-EC", { day: "numeric", month: "short" })}
-                </div>
-              )}
+              <Image src="/fighter-silhouette.png" alt="Avatar" fill style={{ objectFit: "cover" }} />
             </div>
-          ))}
-        </div>
-
-        {/* Community feed */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <Image src="/icon_fire.png" alt="Feed" width={32} height={32} />
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 32, textTransform: "uppercase" }}>TRANSMISIÓN NACIONAL</h2>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {feed.map((item, i) => (
-            <div key={i} style={{ padding: "20px", background: "var(--color-surface)", border: "4px solid var(--color-border)", display: "flex", gap: 16, alignItems: "flex-start" }}>
-              <div style={{ width: 48, height: 48, background: "var(--color-bg)", border: `2px solid ${item.color}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 12, fontFamily: "var(--font-display)", textTransform: "uppercase", padding: "4px 8px", background: "var(--color-text)", color: "var(--color-bg)" }}>CANAL: {item.province}</span>
-                </div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginBottom: 4, textTransform: "uppercase" }}>{item.text}</div>
-                <div style={{ fontSize: 12, color: "var(--color-primary)", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>{item.sub}</div>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+              <textarea 
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder="Dispara un comentario al mundo..."
+                style={{ 
+                  width: "100%", minHeight: 80, padding: 12, background: "var(--color-bg)", border: "2px solid var(--color-border)",
+                  color: "white", fontFamily: "var(--font-body)", fontSize: 14, resize: "none", outline: "none",
+                }}
+                onFocus={(e) => e.target.style.borderColor = "var(--color-primary)"}
+                onBlur={(e) => e.target.style.borderColor = "var(--color-border)"}
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button type="submit" disabled={!newComment.trim()} className="btn-primary" style={{ padding: "8px 24px", opacity: newComment.trim() ? 1 : 0.5 }}>
+                  ENVIAR MENSAJE
+                </button>
               </div>
             </div>
+          </form>
+        </div>
+
+        {/* Board / Feed */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px clamp(16px, 4vw, 32px)", display: "flex", flexDirection: "column", gap: 20 }}>
+          {comments.map((comment) => (
+            <div key={comment.id} style={{ display: "flex", gap: 16 }}>
+              <div style={{
+                width: 48, height: 48, flexShrink: 0, position: "relative", overflow: "hidden",
+                border: `2px solid ${roleColors[comment.authorRole] || "var(--color-border)"}`, background: "var(--neutral-900)"
+              }}>
+                <Image src="/fighter-silhouette.png" alt="Avatar" fill style={{ objectFit: "cover" }} />
+              </div>
+              <div style={{ flex: 1, background: "rgba(10,10,10,0.6)", padding: "16px", border: "1px solid var(--color-border)", borderLeft: `6px solid ${roleColors[comment.authorRole] || "var(--color-border)"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                  <div>
+                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, textTransform: "uppercase" }}>{comment.authorName}</span>
+                    <span style={{ marginLeft: 8, fontSize: 10, padding: "2px 6px", background: roleColors[comment.authorRole] || "var(--color-border)", color: "white", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>
+                      {comment.authorRole}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{comment.timestamp}</span>
+                </div>
+                <p style={{ fontSize: 14, color: "var(--neutral-100)", lineHeight: 1.5, marginBottom: 16 }}>
+                  {comment.content}
+                </p>
+                <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                  <button style={{ background: "transparent", border: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700 }} onMouseOver={e => e.currentTarget.style.color="var(--color-primary)"} onMouseOut={e => e.currentTarget.style.color="var(--color-text-muted)"}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> {comment.likes}
+                  </button>
+                  <button style={{ background: "transparent", border: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700 }} onMouseOver={e => e.currentTarget.style.color="white"} onMouseOut={e => e.currentTarget.style.color="var(--color-text-muted)"}>
+                    RESPUESTA
+                  </button>
+                </div>
+              </div>
+            </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
-
-        {/* Post input */}
-        <div style={{ marginTop: 32, padding: "20px", background: "var(--neutral-900)", border: "4px solid var(--color-primary)", display: "flex", gap: 16, alignItems: "center", boxShadow: "6px 6px 0px rgba(255,255,255,0.1)" }}>
-          <div style={{ width: 48, height: 48, background: "var(--color-primary)", border: "2px solid var(--color-text)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontSize: 20, color: "white", flexShrink: 0 }}>
-            {user.name.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase()}
-          </div>
-          <input 
-            style={{ flex: 1, padding: "16px", background: "var(--color-bg)", border: "4px solid var(--color-border)", fontSize: 16, color: "white", outline: "none", fontFamily: "var(--font-display)", textTransform: "uppercase" }}
-            placeholder="EMITIR UN MENSAJE AL PÚBLICO..."
-          />
-          <button style={{ padding: "16px 24px", background: "var(--color-text)", border: "none", color: "var(--color-bg)", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase", flexShrink: 0 }}>
-            PUBLICAR
-          </button>
-        </div>
-
-      </main>
+      </div>
     </AppShell>
   );
 }

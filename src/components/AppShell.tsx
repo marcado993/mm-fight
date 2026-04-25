@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, type UserRole } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useStore } from "@/lib/store";
 
 /* ── Icons ─────────────────────────────────────────────────────── */
 const IconHome = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>;
@@ -59,6 +60,7 @@ export default function AppShell({ children, role }: AppShellProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const startLoading = useStore(state => state.startLoading);
 
   const items = NAV_ITEMS[role];
 
@@ -100,7 +102,10 @@ export default function AppShell({ children, role }: AppShellProps) {
             <Link
               key={href}
               href={href}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                setMobileOpen(false);
+                if (!active) startLoading(`CARGANDO ${label.toUpperCase()}...`);
+              }}
               style={{
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "12px 14px", borderRadius: 0, marginBottom: 4,
@@ -139,17 +144,18 @@ export default function AppShell({ children, role }: AppShellProps) {
         <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{
             display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-            borderRadius: 12, background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 0, background: "rgba(255,255,255,0.04)", /* Removed border radius */
+            border: "2px solid rgba(255,255,255,0.15)",
           }}>
-            {/* Avatar */}
+            {/* Avatar Image */}
             <div style={{
               width: 38, height: 38, borderRadius: 0, flexShrink: 0,
-              background: `var(--neutral-800)`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--font-display)", fontSize: 16, color: "var(--color-primary)",
+              background: `var(--neutral-900)`,
               border: `2px solid var(--color-primary)`,
-            }}>{initials}</div>
+              position: "relative", overflow: "hidden"
+            }}>
+              <Image src="/fighter-silhouette.png" alt="Profile" fill style={{ objectFit: "cover" }} />
+            </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "white", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -161,7 +167,10 @@ export default function AppShell({ children, role }: AppShellProps) {
               </div>
             </div>
 
-            <button onClick={handleLogout} title="Cerrar sesión" style={{
+            <button onClick={() => {
+              startLoading("CERRANDO SESIÓN...");
+              handleLogout();
+            }} title="Cerrar sesión" style={{
               background: "none", border: "none", cursor: "pointer",
               color: "rgba(255,255,255,0.3)", padding: 4, display: "flex", flexShrink: 0,
               transition: "color 0.2s",
@@ -175,7 +184,10 @@ export default function AppShell({ children, role }: AppShellProps) {
   );
 
   return (
-    <div style={{ display: "flex", minHeight: "100dvh", background: "var(--color-bg)" }}>
+    <div style={{ display: "flex", minHeight: "100dvh", background: "url(/bg-texture.png) center center / cover fixed", color: "var(--color-text)" }}>
+      {/* Dark overlay for texture */}
+      <div style={{ position: "fixed", inset: 0, background: "rgba(10,10,10,0.85)", zIndex: 0, pointerEvents: "none" }} />
+      <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
 
       {/* ── Desktop sidebar ── */}
       <aside style={{
@@ -237,12 +249,12 @@ export default function AppShell({ children, role }: AppShellProps) {
               <span style={{ position: "absolute", top: -2, right: -2, width: 7, height: 7, borderRadius: "50%", background: "var(--color-primary)" }} />
             </button>
             <div style={{
-              width: 30, height: 30, borderRadius: "50%",
-              background: `linear-gradient(135deg, ${ROLE_COLOR[role]}, rgba(0,0,0,0.6))`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 11,
-              border: `1.5px solid ${ROLE_COLOR[role]}66`,
-            }}>{initials}</div>
+              width: 30, height: 30, borderRadius: 0, position: "relative", overflow: "hidden",
+              background: "var(--neutral-900)",
+              border: `2px solid ${ROLE_COLOR[role]}`,
+            }}>
+               <Image src="/fighter-silhouette.png" alt="Profile" fill style={{ objectFit: "cover" }} />
+            </div>
           </div>
         </header>
 
@@ -266,15 +278,15 @@ export default function AppShell({ children, role }: AppShellProps) {
             </button>
             <div style={{
               display: "flex", alignItems: "center", gap: 8, padding: "6px 12px",
-              background: "rgba(255,255,255,0.04)", borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.07)",
+              background: "rgba(255,255,255,0.04)", borderRadius: 0,
+              border: "1px solid rgba(255,255,255,0.15)",
             }}>
               <div style={{
-                width: 28, height: 28, borderRadius: "50%",
-                background: `linear-gradient(135deg, ${ROLE_COLOR[role]}, rgba(0,0,0,0.5))`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 10,
-              }}>{initials}</div>
+                width: 28, height: 28, borderRadius: 0, position: "relative", overflow: "hidden",
+                border: `2px solid var(--color-primary)`, background: "var(--neutral-900)"
+              }}>
+                <Image src="/fighter-silhouette.png" alt="Profile" fill style={{ objectFit: "cover" }} />
+              </div>
               <div>
                 <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, lineHeight: 1.2 }}>{user?.name?.split(" ")[0]}</div>
                 <div style={{ fontSize: 9, color: ROLE_COLOR[role], fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{ROLE_LABEL[role]}</div>
@@ -299,7 +311,11 @@ export default function AppShell({ children, role }: AppShellProps) {
           {items.slice(0, 5).map(({ href, label, Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
-              <Link key={href} href={href} style={{
+              <Link key={href} href={href} 
+              onClick={() => {
+                if (!active) startLoading(`CARGANDO ${label.toUpperCase()}...`);
+              }}
+              style={{
                 flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
                 justifyContent: "center", gap: 3, padding: "10px 2px",
                 textDecoration: "none", position: "relative",
@@ -314,6 +330,7 @@ export default function AppShell({ children, role }: AppShellProps) {
           })}
         </nav>
       </div>
+      </div> {/* End relative wrapper */}
     </div>
   );
 }

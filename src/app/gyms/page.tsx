@@ -103,7 +103,7 @@ export default function GymsPage() {
       {view === "map" && (
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           {/* Map */}
-          <div style={{ height: "52vh", width: "100%", position: "relative", borderBottom: "4px solid var(--color-text)" }}>
+          <div style={{ height: "68vh", width: "100%", position: "relative", borderBottom: "4px solid var(--color-text)" }}>
             <GymMap gyms={gymMarkers} activeId={activeGymId} onSelect={setActiveGymId} />
           </div>
 
@@ -116,11 +116,11 @@ export default function GymsPage() {
                 <div style={{ padding: "24px", background: "var(--color-surface)", border: "4px solid var(--color-text)", boxShadow: "6px 6px 0px var(--color-primary)" }}>
                   <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 20 }}>
                     <div style={{
-                      width: 64, height: 64, flexShrink: 0,
+                      width: 64, height: 64, flexShrink: 0, position: "relative", overflow: "hidden",
                       background: "var(--neutral-900)", border: "4px solid var(--color-primary)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: "var(--font-display)", fontSize: 24, color: "white"
-                    }}>{initials}</div>
+                    }}>
+                      <Image src="/gym-interior.png" alt="Gym" fill style={{ objectFit: "cover" }} />
+                    </div>
                     <div>
                       <div style={{ fontFamily: "var(--font-display)", fontSize: 28, lineHeight: 1.1, textTransform: "uppercase" }}>{gym.name}</div>
                       <div style={{ fontSize: 14, color: "var(--color-primary)", marginTop: 4, fontFamily: "var(--font-display)", textTransform: "uppercase" }}>UBICACIÓN: {gym.city}, {gym.province}</div>
@@ -179,11 +179,11 @@ export default function GymsPage() {
                   <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap", marginBottom: 20, position: "relative" }}>
                     
                     <div style={{
-                      width: 80, height: 80, flexShrink: 0,
+                      width: 80, height: 80, flexShrink: 0, position: "relative", overflow: "hidden",
                       background: "var(--neutral-900)", border: "4px solid var(--color-primary)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: "var(--font-display)", fontSize: 32, color: "white",
-                    }}>{initials}</div>
+                    }}>
+                      <Image src="/gym-interior.png" alt="Gym" fill style={{ objectFit: "cover" }} />
+                    </div>
 
                     <div style={{ flex: "1 1 200px" }}>
                       <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap", fontFamily: "var(--font-display)", fontSize: "clamp(10px, 2.5vw, 12px)", textTransform: "uppercase" }}>

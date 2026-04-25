@@ -54,9 +54,9 @@ export default function GymMap({ gyms, activeId, onSelect }: GymMapProps) {
     <Map
       ref={mapRef}
       initialViewState={{
-        longitude: -78.5,
-        latitude: -1.8,
-        zoom: 5.5,
+        longitude: -78.49,
+        latitude: -0.21,
+        zoom: 11.5,
         pitch: 45,
         bearing: 0,
       }}
@@ -118,18 +118,15 @@ export default function GymMap({ gyms, activeId, onSelect }: GymMapProps) {
               <div style={{
                 width: isActive ? 44 : 36,
                 height: isActive ? 44 : 36,
-                background: isActive
-                  ? "var(--color-primary, #d32f2f)"
-                  : "#1c1c1c",
+                background: "black",
                 border: `3px solid ${isActive ? "#ff6b6b" : "#d32f2f"}`,
                 clipPath: "polygon(22% 0%, 78% 0%, 100% 22%, 100% 78%, 78% 100%, 22% 100%, 0% 78%, 0% 22%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: isActive ? 18 : 14,
-                lineHeight: 1,
+                position: "relative"
               }}>
-                🥊
+                <img src="/logo.png" alt="Gym" style={{ width: "60%", height: "60%", objectFit: "contain" }} />
               </div>
               {/* Label */}
               <div style={{

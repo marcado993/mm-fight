@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { fighters, events, gyms } from "@/lib/data";
 import type { UserProfile } from "@/lib/auth";
+import { useState } from "react";
 import Image from "next/image";
 
 const styleColors: Record<string, string> = {
@@ -13,6 +14,7 @@ export default function NormalHome({ user }: { user: UserProfile }) {
   const liveEvent = events.find(e => e.status === "live");
   const nextEvent = events.find(e => e.status === "upcoming");
   const featuredGyms = gyms.slice(0, 3);
+  const [showTicketModal, setShowTicketModal] = useState(false);
 
   return (
     <main style={{ padding: "0 16px 40px" }}>
@@ -93,8 +95,8 @@ export default function NormalHome({ user }: { user: UserProfile }) {
           </div>
 
           {/* Action Buttons row */}
-          <div style={{ display: "flex" }}>
-             <button className="animate-jab" style={{ flex: 1, background: "var(--color-primary)", color: "white", padding: "16px 8px", border: "none", fontFamily: "var(--font-display)", fontSize: "clamp(16px, 4vw, 24px)", textTransform: "uppercase", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderRight: "4px solid var(--color-text)", lineHeight: 1.1 }}>
+          <div style={{ display: "flex", position: "relative", zIndex: 100 }}>
+             <button onClick={() => setShowTicketModal(true)} className="animate-jab" style={{ flex: 1, background: "var(--color-primary)", color: "white", padding: "16px 8px", border: "none", fontFamily: "var(--font-display)", fontSize: "clamp(16px, 4vw, 24px)", textTransform: "uppercase", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", borderRight: "4px solid var(--color-text)", lineHeight: 1.1 }}>
                COMPRAR<br/>ENTRADAS
              </button>
              <button className="animate-jab" style={{ flex: 1, background: "var(--neutral-900)", color: "white", padding: "16px", border: "none", fontFamily: "var(--font-display)", fontSize: "clamp(16px, 4vw, 24px)", textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer" }}>
@@ -104,6 +106,64 @@ export default function NormalHome({ user }: { user: UserProfile }) {
         </div>
         )
       })()}
+
+      {/* ── TICKET MODAL ── */}
+      {showTicketModal && nextEvent && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.9)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+           <div className="animate-pulse-glow" style={{ width: "100%", maxWidth: 380, background: "var(--color-bg)", border: "4px solid var(--color-primary)", position: "relative", boxShadow: "10px 10px 0px rgba(255,0,0,0.2)" }}>
+             {/* Close btn */}
+             <button onClick={() => setShowTicketModal(false)} style={{ position: "absolute", top: 12, right: 12, background: "rgba(0,0,0,0.5)", border: "2px solid white", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 24, cursor: "pointer", zIndex: 10 }}>×</button>
+
+             {/* Ticket Header Graphic */}
+             <div style={{ position: "relative", height: 180, overflow: "hidden", borderBottom: "4px dashed var(--color-border)" }}>
+               <Image src="/octagon.png" alt="Ticket Bg" fill style={{ objectFit: "cover", opacity: 0.5 }} />
+               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, var(--color-bg), transparent)" }} />
+               <div style={{ position: "absolute", bottom: 16, left: 16 }}>
+                 <div style={{ fontFamily: "var(--font-display)", fontSize: 12, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "2px" }}>ACCESO GENERAL</div>
+                 <div style={{ fontFamily: "var(--font-display)", fontSize: 32, color: "white", textTransform: "uppercase", lineHeight: 1 }}>{nextEvent.name}</div>
+               </div>
+             </div>
+
+             {/* Ticket Info */}
+             <div style={{ padding: 24 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
+                   <div>
+                      <div style={{ fontSize: 10, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>FECHA</div>
+                      <div style={{ fontSize: 16, fontFamily: "var(--font-display)", color: "white" }}>{new Date(nextEvent.date).toLocaleDateString("es-EC")}</div>
+                   </div>
+                   <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 10, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>SECTOR</div>
+                      <div style={{ fontSize: 16, fontFamily: "var(--font-display)", color: "white", textTransform: "uppercase" }}>GENERAL (S1)</div>
+                   </div>
+                </div>
+
+                {/* Simulated Stripe Input */}
+                <div style={{ marginBottom: 8, fontSize: 12, fontFamily: "var(--font-display)", textTransform: "uppercase", color: "var(--color-text-muted)" }}>[ Stripe Mock ] :: DATOS DE PAGO</div>
+                <div style={{ border: "2px solid var(--color-border)", padding: 12, display: "flex", flexDirection: "column", gap: 12, marginBottom: 24, background: "var(--neutral-900)" }}>
+                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--color-border)", paddingBottom: 8 }}>
+                      <span style={{ fontFamily: "monospace", color: "white", letterSpacing: "1px" }}>4242 4242 4242 4242</span>
+                      <span style={{ fontSize: 16 }}>💳</span>
+                   </div>
+                   <div style={{ display: "flex", gap: 12 }}>
+                      <input type="text" placeholder="MM/AA" readOnly value="12/28" style={{ flex: 1, background: "transparent", border: "none", color: "white", fontFamily: "monospace", outline: "none" }} />
+                      <input type="text" placeholder="CVC" readOnly value="123" style={{ width: 60, background: "transparent", border: "none", color: "white", fontFamily: "monospace", outline: "none" }} />
+                   </div>
+                </div>
+
+                <button onClick={() => { alert('¡Simulación completada! En entorno de prod, irías a Stripe.com'); setShowTicketModal(false); }} className="btn-primary animate-jab" style={{ width: "100%", fontSize: 18, background: "var(--blue-500)", color: "white" }}>
+                   PROCESAR $45.00 →
+                </button>
+             </div>
+             
+             {/* Barcode bottom */}
+             <div style={{ height: 40, background: "white", margin: "0 24px 24px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", opacity: 0.9 }}>
+                {Array.from({length: 40}).map((_, i) => (
+                   <div key={i} style={{ width: Math.random() * 4 + 1, height: "100%", background: "black", marginRight: Math.random() * 3 }} />
+                ))}
+             </div>
+           </div>
+        </div>
+      )}
 
       {/* ── CALENDARIO ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -153,17 +213,16 @@ export default function NormalHome({ user }: { user: UserProfile }) {
       </div>
       <div style={{ display: "flex", gap: 16, overflowX: "auto", marginBottom: 32, paddingBottom: 16, scrollbarWidth: "none" }}>
         {featuredGyms.map(gym => {
-          const initials = gym.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
           return (
             <Link key={gym.id} href={`/gyms/${gym.id}`} style={{ textDecoration: "none", flexShrink: 0 }}>
               <div style={{ width: 220, padding: "20px", background: "var(--color-surface)", border: "4px solid var(--color-text)", boxShadow: "4px 4px 0px rgba(255,255,255,0.15)" }}>
                 <div style={{
                   width: 50, height: 50, marginBottom: 12,
-                  background: "var(--neutral-900)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "var(--font-display)", fontSize: 20, border: "3px solid var(--color-primary)",
-                  color: "white"
-                }}>{initials}</div>
+                  background: "black", position: "relative", overflow: "hidden",
+                  border: "3px solid var(--color-primary)",
+                }}>
+                   <Image src="/logo.png" alt="Gym" fill style={{ objectFit: "contain", padding: 4 }} />
+                </div>
                 <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginBottom: 4, lineHeight: 1.1, textTransform: "uppercase" }}>{gym.name}</div>
                 <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 12, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>Ubicación: {gym.city}</div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid var(--color-border)", paddingTop: 8 }}>
@@ -208,7 +267,6 @@ export default function NormalHome({ user }: { user: UserProfile }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
         {top3.map((f, idx) => {
           const isFirst = idx === 0;
-          const initials = f.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
           return (
             <Link key={f.id} href={`/fighters/${f.id}`} style={{ textDecoration: "none" }}>
               <div style={{
@@ -225,8 +283,8 @@ export default function NormalHome({ user }: { user: UserProfile }) {
                   #{f.rank}
                 </div>
                 
-                <div style={{ width: 60, height: 60, background: "var(--neutral-800)", border: "2px solid var(--color-border)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontSize: 24, color: "white", marginTop: 12 }}>
-                  {initials}
+                <div style={{ width: 60, height: 60, background: "var(--neutral-900)", border: "2px solid var(--color-primary)", position: "relative", overflow: "hidden", marginTop: 12 }}>
+                  <Image src="/fighter-silhouette.png" alt="Fighter" fill style={{ objectFit: "cover" }} />
                 </div>
                 
                 <div style={{ flex: 1, zIndex: 2, marginTop: 12 }}>

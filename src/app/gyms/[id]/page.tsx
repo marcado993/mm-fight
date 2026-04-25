@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { OctagonAvatar } from "@/components/FighterCard";
 import { notFound, useParams } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
@@ -30,7 +31,13 @@ export default function GymDetailPage() {
         borderBottom: "1px solid var(--color-border)"
       }}>
         <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-          <OctagonAvatar initials={gymInitials} size={80} />
+          <div style={{
+            width: 80, height: 80, flexShrink: 0, position: "relative", overflow: "hidden",
+            background: "var(--neutral-900)", border: "4px solid var(--color-primary)",
+            clipPath: "polygon(22% 0%, 78% 0%, 100% 22%, 100% 78%, 78% 100%, 22% 100%, 0% 78%, 0% 22%)",
+          }}>
+            <Image src="/gym-interior.png" alt="Gym" fill style={{ objectFit: "cover" }} />
+          </div>
           <div>
             <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
               <span className="badge badge-red">Elite Camp</span>

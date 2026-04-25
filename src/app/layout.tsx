@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
+import GlobalLoader from "@/components/GlobalLoader";
 
 export const metadata: Metadata = {
   title: "MMA Ecuador — Plataforma Nacional",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#0d0d0d" />
       </head>
       <body className="antialiased">
+        <GlobalLoader />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

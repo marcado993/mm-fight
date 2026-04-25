@@ -23,6 +23,13 @@ export default function LandingPage() {
             MMA<span style={{ color: "var(--color-primary)" }}>EC</span>
           </span>
         </div>
+        
+        {/* CENTER LINKS */}
+        <div className="hidden md:flex items-center gap-10">
+          <a href="#podio-absoluto" className="hover-lift" style={{ color: "var(--color-text)", textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 24, textTransform: "uppercase", letterSpacing: "1px" }}>TOP NACIONAL</a>
+          <a href="#elige-tu-camino" className="hover-lift" style={{ color: "var(--color-text)", textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 24, textTransform: "uppercase", letterSpacing: "1px" }}>CUENTAS</a>
+        </div>
+
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Link href="/login" style={{ textDecoration: "none" }}>
             <button style={{ 
@@ -147,41 +154,76 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── TOP FIGHTERS GRID - BRUTALIST ── */}
-      <section style={{ padding: "100px clamp(20px, 5vw, 80px)" }}>
-        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(48px, 8vw, 80px)", textTransform: "uppercase", textAlign: "center", marginBottom: 60, textShadow: "3px 3px 0 var(--color-primary)" }}>
-          LOS MÁS LETALES
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-          {top3.map((f, i) => (
-            <div key={f.id} className="hover-lift" style={{ 
-              background: "var(--color-surface)", border: "4px solid var(--color-text)",
-              padding: 24, position: "relative",
-              boxShadow: "6px 6px 0px var(--color-primary)",
-            }}>
-              <div style={{ position: "absolute", top: -24, left: 16, background: "var(--color-text)", color: "var(--color-bg)", fontFamily: "var(--font-display)", fontSize: 40, padding: "0 16px", border: "4px solid var(--color-primary)" }}>
-                #{f.rank}
-              </div>
-              <div style={{ marginTop: 20, fontFamily: "var(--font-display)", fontSize: 36, textTransform: "uppercase", lineHeight: 1 }}>{f.name}</div>
-              {f.nickname && <div style={{ fontSize: 20, fontFamily: "var(--font-display)", color: "var(--color-primary)" }}>"{f.nickname}"</div>}
-              
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24, borderTop: "4px solid var(--neutral-700)", paddingTop: 16 }}>
-                <div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>Gimnasio</div>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: 20 }}>{f.gym}</div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>Récord</div>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--color-success)" }}>{f.proRecord.w}-{f.proRecord.l}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* ── TOP FIGHTERS GRID - BRUTALIST PODIUM ── */}
+      <section id="podio-absoluto" style={{ 
+        padding: "100px clamp(20px, 5vw, 80px)", position: "relative", overflow: "hidden",
+        borderTop: "4px solid var(--color-primary)", borderBottom: "4px solid var(--color-text)" 
+      }}>
+        {/* Arena Background */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0, opacity: 0.15, pointerEvents: "none" }}>
+          <Image src="/octagon_aerial_1777139798761.png" alt="Arena Background" fill style={{ objectFit: "cover", objectPosition: "center" }} />
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(to top, var(--color-bg) 0%, transparent 50%, var(--color-bg) 100%)" }} />
         </div>
+
+        <div style={{ position: "relative", zIndex: 10 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(40px, 8vw, 80px)", textTransform: "uppercase", textAlign: "center", marginBottom: 80, textShadow: "4px 4px 0 var(--color-primary)" }}>
+            EL PODIO ABSOLUTO
+          </h2>
+        
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "flex-end", gap: 24, minHeight: 450 }}>
+          {[
+            { f: top3[2], height: 280, flex: 1, type: "left" },
+            { f: top3[0], height: 420, flex: 1.2, type: "center" },
+            { f: top3[1], height: 350, flex: 1, type: "right" }
+          ].map(({ f, height, flex, type }) => {
+            if (!f) return null;
+            const isCenter = type === "center";
+            return (
+              <div key={f.id} className="hover-lift" style={{ 
+                height: height,
+                display: "flex", flexDirection: "column", justifyContent: "flex-start",
+                background: isCenter ? "var(--neutral-900)" : "var(--color-surface)", 
+                border: isCenter ? "6px solid var(--color-primary)" : "4px solid var(--color-text)",
+                padding: "50px 24px 24px", position: "relative",
+                boxShadow: isCenter ? "8px 8px 0px rgba(208,0,0,0.4)" : "6px 6px 0px var(--color-primary)",
+                flex: "1 1 280px", maxWidth: isCenter ? 400 : 340,
+                marginTop: isCenter ? 0 : 40 // Push sides down on mobile wrapping
+              }}>
+                <div style={{ position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)", background: isCenter ? "var(--color-primary)" : "var(--color-text)", color: isCenter ? "white" : "var(--color-bg)", fontFamily: "var(--font-display)", fontSize: 44, padding: "4px 24px", border: "4px solid var(--color-bg)", zIndex: 10, lineHeight: 1 }}>
+                  #{f.rank}
+                </div>
+                
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+                   <div style={{ fontFamily: "var(--font-display)", fontSize: isCenter ? 42 : 32, textTransform: "uppercase", lineHeight: 1.1, color: isCenter ? "white" : "var(--color-text)" }}>{f.name}</div>
+                   {f.nickname && <div style={{ fontSize: isCenter ? 24 : 18, fontFamily: "var(--font-display)", color: "var(--color-primary)", marginTop: 8 }}>"{f.nickname}"</div>}
+                </div>
+                
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24, borderTop: isCenter ? "4px solid rgba(255,255,255,0.1)" : "4px solid var(--neutral-700)", paddingTop: 16 }}>
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontSize: 11, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>GIMNASIO</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: isCenter ? "white" : "var(--color-text)", textTransform: "uppercase", paddingTop: 4 }}>{f.gym}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 11, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>RÉCORD</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 32, color: "var(--color-success)", lineHeight: 1 }}>{f.proRecord.w}-{f.proRecord.l}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        </div> {/* End zIndex 10 container */}
       </section>
 
       {/* ── ROLE SELECTOR BRUTALIST ── */}
-      <section style={{ padding: "60px clamp(20px, 5vw, 80px) 120px", background: "var(--neutral-900)", borderTop: "4px solid var(--neutral-700)" }}>
+      <section id="elige-tu-camino" style={{ 
+        padding: "60px clamp(20px, 5vw, 80px) 120px", 
+        position: "relative",
+        background: "url(/role-selector.png) center center / cover no-repeat", 
+        borderTop: "4px solid var(--color-primary)" 
+      }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(10,10,10,0.9)", zIndex: 0 }} />
+        <div style={{ position: "relative", zIndex: 10 }}>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(40px, 6vw, 64px)", textTransform: "uppercase", marginBottom: 40 }}>ELIGE TU CAMINO</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32 }}>
           {[
@@ -204,6 +246,12 @@ export default function LandingPage() {
               </div>
             </div>
           ))}
+        </div>
+        {/* Additional info / terms */}
+        <div style={{ display: "flex", gap: 24, marginTop: 40, fontFamily: "var(--font-display)", textTransform: "uppercase", fontSize: 13, color: "var(--color-text-muted)" }}>
+          <span>POLÍTICAS DE PRIVACIDAD</span>
+          <span>TÉRMINOS DE SERVICIO</span>
+        </div>
         </div>
       </section>
       
