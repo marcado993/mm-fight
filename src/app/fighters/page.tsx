@@ -1,11 +1,13 @@
 "use client";
 import { useState, useMemo } from "react";
-import BottomNav from "@/components/BottomNav";
-import TopBar from "@/components/TopBar";
+import AppShell from "@/components/AppShell";
+import { useAuth } from "@/lib/auth";
+import Image from "next/image";
 import FighterCard from "@/components/FighterCard";
 import { fighters, type Level } from "@/lib/data";
 
 export default function FightersPage() {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [nivel, setNivel] = useState<Level | "">("");
   const [estilo, setEstilo] = useState("");
@@ -19,50 +21,68 @@ export default function FightersPage() {
   ), [search, nivel, estilo]);
 
   return (
-    <div style={{ background: "var(--color-bg)", minHeight: "100dvh", paddingBottom: 80 }}>
-      <TopBar title="Peleadores" />
-
-      <div style={{ padding: "16px 16px 0" }}>
+    <AppShell role={user?.role || "normal"}>
+      <div style={{ padding: "40px 16px 20px", background: "var(--color-surface)", borderBottom: "4px solid var(--color-primary)" }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 48, letterSpacing: "2px", lineHeight: 1, textTransform: "uppercase", marginBottom: 16 }}>DIRECTORIO DE PELEADORES</h1>
+        
         {/* Search */}
-        <div style={{ position: "relative", marginBottom: 14 }}>
-          <svg style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-disabled)" }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
+        <div style={{ position: "relative", marginBottom: 20 }}>
+          <div style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", fontFamily: "var(--font-display)", fontSize: 24, color: "var(--color-primary)", userSelect: "none" }}>
+            🔍
+          </div>
           <input
-            className="input-dark"
-            style={{ paddingLeft: 40 }}
-            placeholder="Buscar peleador, apodo o gimnasio..."
+            style={{ 
+              width: "100%", padding: "16px 16px 16px 56px", 
+              background: "var(--neutral-900)", border: "4px solid var(--color-text)",
+              color: "white", fontFamily: "var(--font-display)", fontSize: 20, textTransform: "uppercase",
+              outline: "none"
+            }}
+            placeholder="BUSCAR NOMBRE, APODO O GIMNASIO..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
         </div>
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 8, alignItems: "center" }}>
           {(["","Amateur","Pro"] as const).map(l => (
-            <button key={l} className={`chip${nivel === l ? " active" : ""}`} onClick={() => setNivel(l as Level | "")}>{l || "Todos"}</button>
+            <button key={l} style={{
+              padding: "8px 16px", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", 
+              background: nivel === l ? "var(--color-primary)" : "transparent",
+              color: nivel === l ? "white" : "var(--color-text)",
+              border: "2px solid", borderColor: nivel === l ? "var(--color-primary)" : "var(--color-border)",
+              cursor: "pointer", whiteSpace: "nowrap"
+            }} onClick={() => setNivel(l as Level | "")}>{l || "TODOS LOS NIVELES"}</button>
           ))}
-          <div style={{ width: 1, background: "var(--color-border)", flexShrink: 0 }} />
+          <div style={{ width: 4, height: 24, background: "var(--color-border)", flexShrink: 0 }} />
           {["","Striker","Grappler","Mixto"].map(s => (
-            <button key={s} className={`chip${estilo === s ? " active" : ""}`} onClick={() => setEstilo(e => e === s ? "" : s)}>{s || "Est. Todos"}</button>
+            <button key={s} style={{
+              padding: "8px 16px", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", 
+              background: estilo === s ? "var(--color-text)" : "transparent",
+              color: estilo === s ? "var(--color-bg)" : "var(--color-text)",
+              border: "2px solid", borderColor: estilo === s ? "var(--color-text)" : "var(--color-border)",
+              cursor: "pointer", whiteSpace: "nowrap"
+            }} onClick={() => setEstilo(e => e === s ? "" : s)}>{s || "CUALQUIER ESTILO"}</button>
           ))}
         </div>
 
-        <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", fontWeight: 600, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-          {filtered.length} peleadores
+        <div style={{ fontSize: 14, color: "var(--color-primary)", fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" }}>
+          {filtered.length} COMBATIENTES ENCONTRADOS
         </div>
       </div>
 
-      <main style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+      <main style={{ padding: "24px 16px 40px", display: "flex", flexDirection: "column", gap: 16 }}>
         {filtered.map(f => <FighterCard key={f.id} fighter={f} showRank={true} />)}
+        
         {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--color-text-muted)" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🥊</div>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16 }}>Sin resultados</div>
+          <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--color-text-muted)", background: "var(--color-surface)", border: "4px dashed var(--color-border)" }}>
+            <div style={{ marginBottom: 16 }}>
+              <Image src="/icon_glove.png" width={64} height={64} alt="Glove" style={{ opacity: 0.5 }} />
+            </div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase" }}>NINGÚN PELEADOR COINCIDE</div>
+            <div style={{ fontSize: 14, marginTop: 8, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>LA BÚSQUEDA HA FALLADO. REDEFINE LOS PARÁMETROS.</div>
           </div>
         )}
       </main>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

@@ -1,15 +1,17 @@
 "use client";
-import { useState } from "react";
-import BottomNav from "@/components/BottomNav";
-import TopBar from "@/components/TopBar";
+import { useState, useEffect } from "react";
+import AppShell from "@/components/AppShell";
 import { challenges, getFighterById, getGymById } from "@/lib/data";
 import type { Challenge } from "@/lib/data";
+import { useAuth } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const statusConfig = {
-  pending:   { label: "Pendiente",  color: "var(--yellow-500)", bg: "rgba(234,179,8,0.12)" },
-  accepted:  { label: "Aceptado",   color: "var(--green-500)",  bg: "rgba(34,197,94,0.12)" },
-  rejected:  { label: "Rechazado",  color: "var(--red-400)",    bg: "rgba(239,68,68,0.12)" },
-  scheduled: { label: "Programado", color: "var(--blue-500)",   bg: "rgba(59,130,246,0.12)" },
+  pending:   { label: "EN ESPERA",  color: "var(--yellow-400)", bg: "var(--neutral-900)", border: "var(--yellow-600)" },
+  accepted:  { label: "PACTADO",   color: "var(--color-bg)",  bg: "var(--color-primary)", border: "var(--color-text)" },
+  rejected:  { label: "DECLINADO",  color: "var(--color-bg)",    bg: "var(--neutral-500)", border: "var(--neutral-700)" },
+  scheduled: { label: "PROGRAMADO", color: "white",   bg: "var(--blue-600)", border: "var(--color-text)" },
 };
 
 function ChallengeCard({ challenge, onAccept, onReject }: {
@@ -27,93 +29,105 @@ function ChallengeCard({ challenge, onAccept, onReject }: {
 
   return (
     <div style={{
-      background: "var(--card-bg)", borderRadius: 20,
-      border: `1px solid ${challenge.status === "pending" ? "var(--color-primary)" : "var(--card-border)"}`,
-      overflow: "hidden"
+      background: "var(--color-surface)",
+      border: `4px solid ${challenge.status === "pending" ? "var(--color-primary)" : "var(--color-text)"}`,
+      boxShadow: challenge.status === "pending" ? "6px 6px 0px rgba(208,0,0,0.4)" : "6px 6px 0px rgba(255,255,255,0.1)",
+      marginBottom: 24,
+      position: "relative"
     }}>
-      {/* Status bar */}
-      <div style={{ padding: "10px 16px", background: status.bg, display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: status.color }} />
-        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: status.color }}>
+      {/* Status block top left */}
+      <div style={{ position: "absolute", top: -4, left: -4, background: status.bg, border: `4px solid ${status.border}`, padding: "4px 12px", zIndex: 10 }}>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", color: status.color, textShadow: "1px 1px 0px rgba(0,0,0,0.5)" }}>
           {status.label}
-        </span>
-        <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--color-text-muted)" }}>
-          {challenge.weightClass}
         </span>
       </div>
 
-      {/* Matchup */}
-      <div style={{ padding: "20px 16px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center", marginBottom: 16 }}>
+      <div style={{ padding: "40px 24px 24px" }}>
+        
+        {/* Matchup */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center", marginBottom: 24 }}>
           {/* Challenger */}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{
-              width: 60, height: 60, borderRadius: "50%", margin: "0 auto 8px",
-              background: "linear-gradient(135deg, var(--red-800), var(--red-600))",
+              width: 80, height: 80, background: "var(--color-primary)",
+              border: "4px solid var(--color-text)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 18, color: "white",
-              border: "2px solid var(--color-primary)"
+              fontFamily: "var(--font-display)", fontSize: 32, color: "white",
+              margin: "0 auto 12px",
             }}>{fromInit}</div>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 13, lineHeight: 1.2 }}>{from?.name ?? "?"}</div>
-            <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>{fromGym?.name}</div>
-            <div className="record-display" style={{ fontSize: 13, justifyContent: "center", marginTop: 4 }}>
-              <span className="record-w">{from?.proRecord.w ?? 0}</span>
-              <span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 11 }}>-</span>
-              <span className="record-l">{from?.proRecord.l ?? 0}</span>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, lineHeight: 1.1, textTransform: "uppercase" }}>{from?.name ?? "?"}</div>
+            <div style={{ fontSize: 12, color: "var(--color-primary)", marginTop: 4, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>{fromGym?.name}</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginTop: 8, background: "var(--color-bg)", padding: "2px 8px", border: "2px solid var(--color-border)" }}>
+              <span style={{ color: "var(--record-win)" }}>{from?.proRecord.w ?? 0}</span>
+              <span style={{ color: "var(--color-text-muted)" }}>:</span>
+              <span style={{ color: "var(--record-loss)" }}>{from?.proRecord.l ?? 0}</span>
             </div>
           </div>
 
-          {/* VS */}
+          {/* VS block */}
           <div style={{
-            padding: "8px 14px", background: "var(--color-primary)", borderRadius: 10,
-            fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 16, color: "white"
+            width: 48, height: 48,
+            background: "var(--color-text)", border: `4px solid ${challenge.status === "pending" ? "var(--color-primary)" : "var(--color-bg)"}`,
+            fontFamily: "var(--font-display)", fontSize: 24, color: "var(--color-bg)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transform: "rotate(-10deg)"
           }}>VS</div>
 
           {/* Defender */}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{
-              width: 60, height: 60, borderRadius: "50%", margin: "0 auto 8px",
-              background: "linear-gradient(135deg, var(--neutral-700), var(--neutral-600))",
+              width: 80, height: 80, background: "var(--neutral-900)",
+              border: "4px solid var(--color-text)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 18, color: "white",
-              border: "2px solid var(--card-border)"
+              fontFamily: "var(--font-display)", fontSize: 32, color: "white",
+              margin: "0 auto 12px",
             }}>{toInit}</div>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 13, lineHeight: 1.2 }}>{to?.name ?? "?"}</div>
-            <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>{toGym?.name}</div>
-            <div className="record-display" style={{ fontSize: 13, justifyContent: "center", marginTop: 4 }}>
-              <span className="record-w">{to?.proRecord.w ?? 0}</span>
-              <span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 11 }}>-</span>
-              <span className="record-l">{to?.proRecord.l ?? 0}</span>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, lineHeight: 1.1, textTransform: "uppercase" }}>{to?.name ?? "?"}</div>
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>{toGym?.name}</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 20, marginTop: 8, background: "var(--neutral-900)", padding: "2px 8px", border: "2px solid var(--color-border)" }}>
+              <span style={{ color: "white" }}>{to?.proRecord.w ?? 0}</span>
+              <span style={{ color: "var(--color-text-muted)" }}>:</span>
+              <span style={{ color: "var(--color-text-muted)" }}>{to?.proRecord.l ?? 0}</span>
             </div>
           </div>
         </div>
 
         {/* Message */}
         {challenge.message && (
-          <div style={{ padding: "10px 14px", background: "var(--color-surface-raised)", borderRadius: 10, marginBottom: 14, borderLeft: "3px solid var(--color-primary)" }}>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", fontStyle: "italic" }}>&ldquo;{challenge.message}&rdquo;</p>
+          <div style={{ padding: "16px", background: "var(--neutral-900)", borderLeft: "8px solid var(--color-primary)", marginBottom: 16 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 14, color: "var(--color-primary)", marginBottom: 4 }}>MENSAJE ABIERTO:</div>
+            <p style={{ fontSize: 16, color: "white", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>"{challenge.message}"</p>
           </div>
         )}
 
-        {/* Scheduled info */}
-        {(challenge.proposedDate || challenge.proposedVenue) && (
-          <div style={{ padding: "10px 14px", background: "var(--color-surface-raised)", borderRadius: 10, marginBottom: 14 }}>
-            {challenge.proposedDate && (
-              <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginBottom: 2 }}>
-                📅 {new Date(challenge.proposedDate).toLocaleDateString("es-EC", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-              </div>
-            )}
-            {challenge.proposedVenue && (
-              <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>📍 {challenge.proposedVenue}</div>
-            )}
-          </div>
-        )}
+        {/* Info Block */}
+        <div style={{
+          width: "100%", padding: "12px",
+          background: "var(--color-bg)", border: "2px solid var(--color-border)",
+          display: "flex", justifyContent: "center", gap: 16,
+          fontFamily: "var(--font-display)", fontSize: 14, textTransform: "uppercase",
+          flexWrap: "wrap", textAlign: "center", marginBottom: challenge.status === "pending" ? 24 : 0
+        }}>
+          <span style={{ color: "var(--color-primary)" }}>PESO: {challenge.weightClass}</span>
+          {challenge.proposedDate && (
+            <>
+              <span style={{ color: "var(--color-border)" }}>|</span>
+              <span style={{ color: "white" }}>FECHA: {new Date(challenge.proposedDate).toLocaleDateString("es-EC")}</span>
+            </>
+          )}
+          {challenge.proposedVenue && (
+            <>
+              <span style={{ color: "var(--color-border)" }}>|</span>
+              <span style={{ color: "var(--color-text-muted)" }}>SEDE: {challenge.proposedVenue}</span>
+            </>
+          )}
+        </div>
 
         {/* Actions for pending */}
         {challenge.status === "pending" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <button onClick={onReject} className="btn-secondary" style={{ width: "100%", padding: "10px 16px", fontSize: 13 }}>✕ Rechazar</button>
-            <button onClick={onAccept} className="btn-primary" style={{ width: "100%", padding: "10px 16px", fontSize: 13 }}>✓ Aceptar</button>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16 }}>
+            <button onClick={onReject} style={{ padding: "16px", background: "transparent", border: "4px solid var(--color-text-muted)", color: "var(--color-text-muted)", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase" }}>IGNORAR</button>
+            <button onClick={onAccept} style={{ padding: "16px", background: "var(--color-primary)", border: "4px solid var(--color-text)", color: "white", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase", boxShadow: "4px 4px 0px rgba(0,0,0,0.5)" }}>ACEPTAR CONDICIONES</button>
           </div>
         )}
       </div>
@@ -122,10 +136,20 @@ function ChallengeCard({ challenge, onAccept, onReject }: {
 }
 
 export default function MatchmakingPage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
   const [tab, setTab] = useState<"recibidos" | "enviados" | "historial">("recibidos");
   const [localChallenges, setLocalChallenges] = useState(challenges);
   const [showForm, setShowForm] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
+
+  useEffect(() => {
+    if (!isLoading && !user) router.replace("/landing");
+  }, [user, isLoading, router]);
+
+  if (isLoading || !user) return null;
+
+  const isGym = user.role === "gym";
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -134,11 +158,11 @@ export default function MatchmakingPage() {
 
   const handleAccept = (id: string) => {
     setLocalChallenges(prev => prev.map(c => c.id === id ? { ...c, status: "accepted" } : c));
-    showToast("✅ Reto aceptado. ¡Que empiece la batalla!");
+    showToast("RETO ACEPTADO. LA SANGRE ESTÁ SELLADA.");
   };
   const handleReject = (id: string) => {
     setLocalChallenges(prev => prev.map(c => c.id === id ? { ...c, status: "rejected" } : c));
-    showToast("❌ Reto rechazado.");
+    showToast("RETO IGNORADO.");
   };
 
   const received = localChallenges.filter(c => c.toFighterId === "f3" || c.toGymId === "g3");
@@ -148,42 +172,53 @@ export default function MatchmakingPage() {
   const tabData = tab === "recibidos" ? received : tab === "enviados" ? sent : history;
 
   return (
-    <div style={{ background: "var(--color-bg)", minHeight: "100dvh", paddingBottom: 100 }}>
-      <TopBar title="War Room" />
+    <AppShell role={user.role}>
+      <div style={{ paddingBottom: 40 }}>
 
       {/* Toast */}
       {toastMsg && (
         <div style={{
           position: "fixed", top: 80, left: "50%", transform: "translateX(-50%)",
-          background: "var(--card-bg)", border: "1px solid var(--color-border)",
-          padding: "12px 20px", borderRadius: 12, zIndex: 200,
-          fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 13,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.5)"
+          background: "var(--color-primary)", border: "4px solid var(--color-text)",
+          padding: "16px 24px", zIndex: 200, color: "white",
+          fontFamily: "var(--font-display)", fontSize: 20, textTransform: "uppercase",
+          boxShadow: "6px 6px 0px rgba(0,0,0,0.8)"
         }}>{toastMsg}</div>
       )}
 
       {/* Header */}
-      <div style={{ padding: "20px 20px 0", background: "linear-gradient(180deg, #1a0505 0%, var(--color-bg) 100%)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+      <div style={{ padding: "40px 20px 0", background: "var(--color-surface)", borderBottom: "4px solid var(--color-primary)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 28, letterSpacing: "-0.03em" }}>⚔️ WAR ROOM</h1>
-            <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginTop: 2 }}>Matchmaking Terminal</p>
+            <h1 style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontSize: 48, letterSpacing: "2px", lineHeight: 1, textTransform: "uppercase", marginBottom: 8 }}>
+              <Image src="/icon_swords.png" width={48} height={48} alt="War Room" />
+              SALA DE GUERRA
+            </h1>
+            <p style={{ fontSize: 16, color: "var(--color-primary)", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px" }}>TERMINAL DE MATCHMAKING SUPERIOR</p>
           </div>
-          <button className="btn-primary" style={{ padding: "10px 16px", fontSize: 12 }} onClick={() => setShowForm(!showForm)}>
-            + Nuevo Reto
-          </button>
+          {/* Only gym accounts can create challenges */}
+          {isGym ? (
+            <button style={{ padding: "16px 24px", background: "var(--color-text)", border: "none", color: "var(--color-bg)", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase" }} onClick={() => setShowForm(!showForm)}>
+              + EMITIR DESAFÍO
+            </button>
+          ) : (
+            <div style={{ padding: "8px 16px", background: "var(--neutral-900)", border: "2px solid var(--color-primary)" }}>
+              <span style={{ fontSize: 12, color: "var(--color-primary)", fontFamily: "var(--font-display)", textTransform: "uppercase" }}>MODO LECTURA // SOLO GYMS DECLARAN GUERRA</span>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 0, marginTop: 20, borderBottom: "1px solid var(--color-border)" }}>
+        <div style={{ display: "flex", gap: 16, marginTop: 32 }}>
           {(["recibidos","enviados","historial"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
-              padding: "10px 16px", border: "none", background: "none", cursor: "pointer",
-              fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              color: tab === t ? "var(--color-primary)" : "var(--color-text-muted)",
-              borderBottom: tab === t ? "2px solid var(--color-primary)" : "2px solid transparent",
-              marginBottom: -1, transition: "color 0.2s"
+              padding: "16px 24px", border: "none",
+              background: tab === t ? "var(--color-primary)" : "transparent",
+              cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 20, textTransform: "uppercase",
+              color: tab === t ? "white" : "var(--color-text-muted)",
+              borderTop: "4px solid", borderLeft: "4px solid", borderRight: "4px solid",
+              borderColor: tab === t ? "var(--color-text)" : "transparent",
+              marginBottom: -4
             }}>{t}</button>
           ))}
         </div>
@@ -191,29 +226,30 @@ export default function MatchmakingPage() {
 
       {/* New Challenge Form */}
       {showForm && (
-        <div style={{ margin: "16px 16px 0", padding: "20px", background: "var(--card-bg)", borderRadius: 16, border: "1px solid var(--color-primary)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, marginBottom: 14 }}>Nuevo Reto</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <input className="input-dark" placeholder="Peleador contrincante..." />
-            <input className="input-dark" placeholder="Categoría de peso..." />
-            <textarea className="input-dark" placeholder="Mensaje (callout)..." style={{ resize: "none", height: 80 }} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <button className="btn-secondary" onClick={() => setShowForm(false)} style={{ fontSize: 13 }}>Cancelar</button>
-              <button className="btn-primary" onClick={() => { setShowForm(false); showToast("🚀 Reto enviado!"); }} style={{ fontSize: 13 }}>Enviar Reto</button>
+        <div style={{ margin: "24px 16px", padding: "24px", background: "var(--color-surface)", border: "4px solid var(--color-text)", boxShadow: "6px 6px 0px var(--color-primary)" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase", marginBottom: 20 }}>REDACTAR NUEVO RETO OFICIAL</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <input style={{ padding: "16px", background: "var(--neutral-900)", border: "4px solid var(--color-border)", color: "white", fontFamily: "var(--font-display)", fontSize: 16, outline: "none", textTransform: "uppercase" }} placeholder="OBJETIVO (NOMBRE DEL PELEADOR)..." />
+            <input style={{ padding: "16px", background: "var(--neutral-900)", border: "4px solid var(--color-border)", color: "white", fontFamily: "var(--font-display)", fontSize: 16, outline: "none", textTransform: "uppercase" }} placeholder="CATEGORÍA DE PESO LIMITADA..." />
+            <textarea style={{ padding: "16px", background: "var(--neutral-900)", border: "4px solid var(--color-border)", color: "white", fontFamily: "var(--font-display)", fontSize: 16, outline: "none", textTransform: "uppercase", resize: "none", height: 120 }} placeholder="MENSAJE DE PROVOCACIÓN ABIERTA..." />
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16, marginTop: 8 }}>
+              <button onClick={() => setShowForm(false)} style={{ padding: "16px", background: "transparent", border: "4px solid var(--color-text-muted)", color: "var(--color-text-muted)", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase" }}>RETIRADA</button>
+              <button onClick={() => { setShowForm(false); showToast("MISIVA ENVIADA CON ÉXITO."); }} style={{ padding: "16px", background: "var(--color-primary)", border: "4px solid var(--color-text)", color: "white", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer", textTransform: "uppercase", boxShadow: "4px 4px 0px rgba(0,0,0,0.5)" }}>EJECUTAR DESAFÍO</button>
             </div>
           </div>
         </div>
       )}
 
-      <main style={{ padding: "16px" }}>
+      <main style={{ padding: "40px 16px" }}>
         {tabData.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--color-text-muted)" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>⚔️</div>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16 }}>Sin retos {tab}</div>
-            <div style={{ fontSize: 13, marginTop: 4 }}>Los retos aparecerán aquí</div>
+          <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--color-text-muted)", background: "var(--color-surface)", border: "4px dashed var(--color-border)" }}>
+            <Image src="/icon_swords.png" width={64} height={64} alt="Empty" style={{ opacity: 0.5, marginBottom: 16 }} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase" }}>LA ARENA ESTÁ VACÍA ({tab})</div>
+            <div style={{ fontSize: 14, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase", marginTop: 8 }}>NO HAY ACTIVIDAD DETECTADA</div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {tabData.map(c => (
               <ChallengeCard
                 key={c.id} challenge={c}
@@ -224,8 +260,7 @@ export default function MatchmakingPage() {
           </div>
         )}
       </main>
-
-      <BottomNav />
-    </div>
+      </div>
+    </AppShell>
   );
 }

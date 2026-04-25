@@ -1,9 +1,10 @@
 "use client";
 import { useState, useMemo } from "react";
-import BottomNav from "@/components/BottomNav";
-import TopBar from "@/components/TopBar";
+import AppShell from "@/components/AppShell";
+import { useAuth } from "@/lib/auth";
 import { fighters, type WeightClass, type Level, type Province } from "@/lib/data";
 import Link from "next/link";
+import Image from "next/image";
 
 const weightClasses: WeightClass[] = ["Paja","Mosca","Gallo","Pluma","Ligero","Superligero","Welter","Superwelter","Mediano","Semipesado","Pesado"];
 const provinces: Province[] = ["Pichincha","Guayas","Azuay","Manabí","El Oro","Tungurahua"];
@@ -15,6 +16,7 @@ const styleColors: Record<string, string> = {
 };
 
 export default function RankingsPage() {
+  const { user } = useAuth();
   const [peso, setPeso] = useState<WeightClass | "">("");
   const [nivel, setNivel] = useState<Level | "">("");
   const [provincia, setProvincia] = useState<Province | "">("");
@@ -33,97 +35,108 @@ export default function RankingsPage() {
   }, [peso, nivel, provincia, estilo]);
 
   return (
-    <div style={{ background: "var(--color-bg)", minHeight: "100dvh", paddingBottom: 80 }}>
-      <TopBar title="Rankings" />
-
+    <AppShell role={user?.role || "normal"}>
       {/* Header */}
-      <div style={{ padding: "20px 20px 0", background: "linear-gradient(180deg, #1a0505 0%, var(--color-bg) 100%)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-          <span style={{ fontSize: 28 }}>🔥</span>
-          <h1 className="font-display" style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 32, letterSpacing: "-0.04em", lineHeight: 1 }}>
+      <div style={{ padding: "40px 20px 20px", background: "var(--color-surface)", borderBottom: "4px solid var(--color-primary)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <Image src="/icon_fire.png" alt="Top Ranking" width={40} height={40} style={{ objectFit: "contain" }} />
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 48, letterSpacing: "2px", lineHeight: 1, textTransform: "uppercase" }}>
             RANKINGS
           </h1>
         </div>
-        <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 16 }}>
-          Ranking Nacional · {filtered.length} peleadores
+        <p style={{ fontSize: 16, color: "var(--color-primary)", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 24 }}>
+          COMPETENCIA NACIONAL // {filtered.length} COMBATIENTES EN LIZA
         </p>
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 16, scrollbarWidth: "none" }}>
+        <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 16, scrollbarWidth: "none", alignItems: "center" }}>
           {/* Nivel */}
           {levels.map(l => (
-            <button key={l} className={`chip${nivel === l ? " active" : ""}`} onClick={() => setNivel(v => v === l ? "" : l)}>{l}</button>
+            <button key={l} style={{ 
+              padding: "8px 16px", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", 
+              background: nivel === l ? "var(--color-primary)" : "transparent",
+              color: nivel === l ? "white" : "var(--color-text)",
+              border: "2px solid", borderColor: nivel === l ? "var(--color-primary)" : "var(--color-border)",
+              cursor: "pointer", whiteSpace: "nowrap"
+            }} onClick={() => setNivel(v => v === l ? "" : l)}>{l}</button>
           ))}
-          <div style={{ width: 1, background: "var(--color-border)", flexShrink: 0 }} />
+          <div style={{ width: 4, height: 24, background: "var(--color-border)", flexShrink: 0 }} />
           {/* Peso */}
           {weightClasses.map(w => (
-            <button key={w} className={`chip${peso === w ? " active" : ""}`} onClick={() => setPeso(v => v === w ? "" : w)}>{w}</button>
+            <button key={w} style={{ 
+              padding: "8px 16px", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", 
+              background: peso === w ? "var(--color-text)" : "transparent",
+              color: peso === w ? "var(--color-bg)" : "var(--color-text)",
+              border: "2px solid", borderColor: peso === w ? "var(--color-text)" : "var(--color-border)",
+              cursor: "pointer", whiteSpace: "nowrap"
+            }} onClick={() => setPeso(v => v === w ? "" : w)}>{w}</button>
           ))}
-          <div style={{ width: 1, background: "var(--color-border)", flexShrink: 0 }} />
+          <div style={{ width: 4, height: 24, background: "var(--color-border)", flexShrink: 0 }} />
           {/* Provincia */}
           {provinces.map(p => (
-            <button key={p} className={`chip${provincia === p ? " active" : ""}`} onClick={() => setProvincia(v => v === p ? "" : p)}>{p}</button>
-          ))}
-          <div style={{ width: 1, background: "var(--color-border)", flexShrink: 0 }} />
-          {/* Estilo */}
-          {styles.map(s => (
-            <button key={s} className={`chip${estilo === s ? " active" : ""}`} onClick={() => setEstilo(v => v === s ? "" : s)} style={estilo === s ? { color: styleColors[s], borderColor: styleColors[s], background: `${styleColors[s]}22` } : {}}>{s}</button>
+            <button key={p} style={{ 
+              padding: "8px 16px", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase", 
+              background: provincia === p ? "var(--color-text)" : "transparent",
+              color: provincia === p ? "var(--color-bg)" : "var(--color-text)",
+              border: "2px solid", borderColor: provincia === p ? "var(--color-text)" : "var(--color-border)",
+              cursor: "pointer", whiteSpace: "nowrap"
+            }} onClick={() => setProvincia(v => v === p ? "" : p)}>{p}</button>
           ))}
         </div>
       </div>
 
-      <main style={{ padding: "0 16px 16px" }}>
+      <main style={{ padding: "20px 16px 40px" }}>
         {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--color-text-muted)" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16 }}>Sin resultados</div>
-            <div style={{ fontSize: 13, marginTop: 4 }}>Ajusta los filtros</div>
+          <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--color-text-muted)", background: "var(--color-surface)", border: "4px dashed var(--color-border)" }}>
+            <div style={{ marginBottom: 16 }}><Image src="/icon_swords.png" width={48} height={48} alt="Empty" style={{ opacity: 0.5 }} /></div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase" }}>SIN RETADORES ENCONTRADOS</div>
+            <div style={{ fontSize: 14, marginTop: 8, fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>LOS FILTROS ELIMINARON TODAS LAS AMENAZAS</div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {filtered.map((f, idx) => {
               const initials = f.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
               const isFirst = idx === 0 && !peso && !nivel && !provincia && !estilo;
               return (
                 <Link key={f.id} href={`/fighters/${f.id}`} style={{ textDecoration: "none" }}>
                   <div style={{
-                    padding: "16px 18px",
-                    background: isFirst ? "linear-gradient(135deg, #2a0505, #1a0303)" : "var(--card-bg)",
-                    borderRadius: 16, border: `1px solid ${isFirst ? "var(--color-primary)" : "var(--card-border)"}`,
-                    display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
-                    transition: "transform 0.2s, border-color 0.2s",
-                  }}>
+                    padding: "20px",
+                    background: isFirst ? "var(--neutral-900)" : "var(--color-surface)",
+                    border: isFirst ? "4px solid var(--color-primary)" : "4px solid var(--color-text)",
+                    display: "flex", alignItems: "center", gap: 16, cursor: "pointer",
+                    boxShadow: isFirst ? "6px 6px 0px rgba(208,0,0,0.4)" : "4px 4px 0px rgba(255,255,255,0.1)",
+                    transition: "transform 0.1s",
+                  }} onMouseDown={e => e.currentTarget.style.transform = "translate(2px, 2px)"} onMouseUp={e => e.currentTarget.style.transform = "none"}>
                     {/* Position */}
                     <div style={{
-                      width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
-                      background: idx === 0 ? "var(--color-primary)" : idx === 1 ? "linear-gradient(135deg,#c0c0c0,#707070)" : idx === 2 ? "linear-gradient(135deg,#cd7f32,#8b4513)" : "var(--color-surface-raised)",
+                      width: 56, height: 56, flexShrink: 0,
+                      background: isFirst ? "var(--color-primary)" : "var(--color-bg)",
+                      border: "2px solid", borderColor: isFirst ? "var(--color-primary)" : "var(--color-border)",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 15, color: "white"
+                      fontFamily: "var(--font-display)", fontSize: 28, color: isFirst ? "white" : "var(--color-primary)"
                     }}>
-                      {idx < 3 ? initials : `#${idx + 1}`}
+                      #{idx + 1}
                     </div>
 
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 3 }}>
-                        <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 15, color: "var(--color-text)" }}>{f.name}</span>
-                        {f.nickname && <span style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 12, color: "var(--color-text-secondary)" }}>&quot;{f.nickname}&quot;</span>}
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: 24, lineHeight: 1.1, color: "var(--color-text)", textTransform: "uppercase", marginBottom: 6 }}>
+                        {f.name} {f.nickname && <span style={{ color: "var(--color-primary)" }}>"{f.nickname}"</span>}
                       </div>
-                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <span className={`badge badge-${f.level === "Pro" ? "pro" : "amateur"}`}>{f.level}</span>
-                        <span className="badge badge-outline">{f.weightClass}</span>
-                        <span style={{ fontSize: 11, color: "var(--color-text-muted)", alignSelf: "center" }}>{f.city}</span>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontFamily: "var(--font-display)", fontSize: 12, textTransform: "uppercase" }}>
+                        <span style={{ padding: "2px 6px", background: f.level === "Pro" ? "var(--color-primary)" : "var(--neutral-600)", border: "1px solid var(--color-text)" }}>{f.level}</span>
+                        <span style={{ padding: "2px 6px", border: "1px solid var(--color-border)", color: "var(--color-text-muted)" }}>{f.weightClass}</span>
+                        <span style={{ alignSelf: "center", color: "var(--color-text-muted)" }}>// {f.city}</span>
                       </div>
                     </div>
 
-                    <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <div className="record-display" style={{ fontSize: 16, justifyContent: "flex-end" }}>
-                        <span className="record-w">{f.proRecord.w}</span>
-                        <span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 13 }}>-</span>
-                        <span className="record-l">{f.proRecord.l}</span>
-                        {f.proRecord.d > 0 && <><span style={{ color: "var(--color-text-muted)", fontWeight: 400, fontSize: 13 }}>-</span><span className="record-d">{f.proRecord.d}</span></>}
+                    <div style={{ textAlign: "right", flexShrink: 0, background: "var(--neutral-900)", padding: "10px", border: "2px solid var(--color-border)" }}>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: 28, lineHeight: 1 }}>
+                        <span style={{ color: "var(--record-win)" }}>{f.proRecord.w}</span>
+                        <span style={{ color: "var(--color-text-muted)", margin: "0 4px" }}>:</span>
+                        <span style={{ color: "var(--record-loss)" }}>{f.proRecord.l}</span>
                       </div>
-                      <div style={{ fontSize: 10, color: "var(--color-text-muted)", fontFamily: "var(--font-display)", fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>
-                        Pro Record
+                      <div style={{ fontSize: 10, color: "var(--color-primary)", fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "1px", marginTop: 4 }}>
+                        RÉCORD PRO
                       </div>
                     </div>
                   </div>
@@ -133,8 +146,6 @@ export default function RankingsPage() {
           </div>
         )}
       </main>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
-import BottomNav from "@/components/BottomNav";
-import TopBar from "@/components/TopBar";
+import AppShell from "@/components/AppShell";
+import { useAuth } from "@/lib/auth";
+import Image from "next/image";
 import { events, provincialLeagues, type ProvinceLeague } from "@/lib/data";
 
 const typeColors: Record<string, string> = {
@@ -10,34 +11,26 @@ const typeColors: Record<string, string> = {
   Selectivo: "var(--yellow-500)",
 };
 
-/* ─── Hex League Card ─────────────────────────────────── */
+/* ─── Harsh Hex League Card ─────────────────────────────────── */
 function HexLeagueCard({ league }: { league: ProvinceLeague }) {
-  const hexClip = "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)";
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
-      <div style={{ position: "relative", width: 110, height: 96 }}>
-        <div style={{ position: "absolute", inset: 0, clipPath: hexClip, background: "var(--color-primary)" }} />
-        <div style={{
-          position: "absolute", inset: 3, clipPath: hexClip,
-          background: league.color,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 3,
-        }}>
-          <span style={{ fontSize: 26, lineHeight: 1 }}>{league.icon}</span>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 9, color: "white", textTransform: "uppercase", letterSpacing: "0.07em", textAlign: "center", padding: "0 6px" }}>
-            {league.shortName}
-          </div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, flexShrink: 0 }}>
+      {/* Brutalist Block instead of hexagon */}
+      <div style={{ width: 120, height: 120, border: "4px solid var(--color-text)", background: league.color, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px", boxShadow: "4px 4px 0px var(--neutral-900)" }}>
+        <span style={{ fontSize: 32, lineHeight: 1, filter: "grayscale(100%) brightness(200%)" }}>{league.icon}</span>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "white", textTransform: "uppercase", textAlign: "center", textShadow: "1px 1px 0px black" }}>
+          {league.shortName}
         </div>
       </div>
-      <div style={{ textAlign: "center", maxWidth: 100 }}>
-        <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 10, color: "var(--color-text)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{league.name}</div>
-        <div style={{ fontSize: 9, color: "var(--color-text-muted)", marginTop: 1 }}>{league.activeFighters} fighters</div>
+      <div style={{ textAlign: "center", maxWidth: 120 }}>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 14, color: "var(--color-text)", textTransform: "uppercase", lineHeight: 1.1, marginBottom: 4 }}>{league.name}</div>
+        <div style={{ fontSize: 10, color: "var(--color-primary)", fontFamily: "var(--font-body)", fontWeight: 700, textTransform: "uppercase" }}>{league.activeFighters} COMBATIENTES</div>
       </div>
     </div>
   );
 }
 
-/* ─── VS Hero Card ─────────────────────────────────────── */
+/* ─── VS Hero Card Brutalist ─────────────────────────────────────── */
 function ProximoEventoHero() {
   const nextEvent = events.find(e => e.status === "upcoming");
   if (!nextEvent) return null;
@@ -45,68 +38,56 @@ function ProximoEventoHero() {
 
   return (
     <div style={{
-      position: "relative", borderRadius: 20, overflow: "hidden",
-      background: "linear-gradient(180deg, #1a0303 0%, #0d0d0d 100%)",
-      border: "1px solid var(--color-primary)",
-      marginBottom: 24,
+      position: "relative",
+      background: "var(--color-surface)",
+      border: "4px solid var(--color-text)",
+      marginBottom: 32,
+      boxShadow: "8px 8px 0px var(--color-primary)"
     }}>
       {/* Top badge */}
       <div style={{
-        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        zIndex: 10,
-        padding: "6px 24px",
-        background: "var(--color-primary)",
-        clipPath: "polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)",
-        fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 11,
-        textTransform: "uppercase", letterSpacing: "0.1em", color: "white",
-        whiteSpace: "nowrap",
+        position: "absolute", top: -16, left: 16, zIndex: 10,
+        padding: "4px 16px",
+        background: "var(--color-text)",
+        border: "2px solid var(--color-primary)",
+        color: "var(--color-bg)",
+        fontFamily: "var(--font-display)", fontSize: 20,
+        textTransform: "uppercase", whiteSpace: "nowrap",
       }}>
-        PRÓXIMO EVENTO
+        EL PRÓXIMO EVENTO
       </div>
 
-      {/* VS section */}
-      <div style={{ padding: "44px 20px 20px", position: "relative" }}>
-        {/* Red glow bg */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 50% 60%, rgba(211,47,47,0.18) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-
-        {/* Fighter names + VS */}
+      <div style={{ padding: "40px 24px 24px", position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        
         {fight ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center", marginBottom: 16, position: "relative" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center", marginBottom: 24, width: "100%" }}>
+            
             {/* Fighter 1 */}
             <div style={{ textAlign: "center" }}>
               <div style={{
-                width: 70, height: 70, borderRadius: "50%",
-                background: "linear-gradient(135deg, var(--red-800), var(--red-600))",
+                width: 80, height: 80, background: "var(--color-primary)",
+                border: "4px solid var(--color-text)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 22,
-                border: "3px solid var(--color-primary)",
-                margin: "0 auto 10px",
+                fontFamily: "var(--font-display)", fontSize: 32, color: "white",
+                margin: "0 auto 12px",
               }}>
                 {fight.fighter1.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
               </div>
-              <div style={{
-                fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 20,
-                letterSpacing: "-0.03em", lineHeight: 1, textTransform: "uppercase",
-              }}>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 28, lineHeight: 1, textTransform: "uppercase" }}>
                 {fight.fighter1.split(" ")[1] || fight.fighter1.split(" ")[0]}
               </div>
-              <div style={{ fontSize: 10, color: "var(--color-text-muted)", marginTop: 4, fontFamily: "var(--font-display)", fontWeight: 600 }}>
+              <div style={{ fontSize: 14, color: "var(--color-primary)", marginTop: 4, fontFamily: "var(--font-display)", textTransform: "uppercase" }}>
                 {fight.weightClass}
               </div>
             </div>
 
-            {/* VS badge */}
+            {/* VS block */}
             <div style={{
-              padding: "10px 14px",
-              background: "var(--color-primary)",
-              clipPath: "polygon(22% 0%, 78% 0%, 100% 22%, 100% 78%, 78% 100%, 22% 100%, 0% 78%, 0% 22%)",
-              fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 18, color: "white",
-              textAlign: "center", lineHeight: 1, flexShrink: 0,
-              boxShadow: "0 0 20px rgba(211,47,47,0.5)",
+              width: 56, height: 56,
+              background: "var(--color-text)", border: "4px solid var(--color-primary)",
+              fontFamily: "var(--font-display)", fontSize: 32, color: "var(--color-bg)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transform: "rotate(-10deg)"
             }}>
               VS
             </div>
@@ -114,65 +95,56 @@ function ProximoEventoHero() {
             {/* Fighter 2 */}
             <div style={{ textAlign: "center" }}>
               <div style={{
-                width: 70, height: 70, borderRadius: "50%",
-                background: "linear-gradient(135deg, var(--neutral-700), var(--neutral-600))",
+                width: 80, height: 80, background: "var(--neutral-900)",
+                border: "4px solid var(--color-text)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 22,
-                border: "3px solid var(--color-border)",
-                margin: "0 auto 10px",
+                fontFamily: "var(--font-display)", fontSize: 32, color: "white",
+                margin: "0 auto 12px",
               }}>
                 {fight.fighter2.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
               </div>
-              <div style={{
-                fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 20,
-                letterSpacing: "-0.03em", lineHeight: 1, textTransform: "uppercase",
-              }}>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 28, lineHeight: 1, textTransform: "uppercase" }}>
                 {fight.fighter2.split(" ")[1] || fight.fighter2.split(" ")[0]}
               </div>
-              <div style={{ fontSize: 10, color: "var(--color-text-muted)", marginTop: 4, fontFamily: "var(--font-display)", fontWeight: 600 }}>
+              <div style={{ fontSize: 14, color: "var(--color-text-muted)", marginTop: 4, fontFamily: "var(--font-display)", textTransform: "uppercase" }}>
                 {fight.weightClass}
               </div>
             </div>
           </div>
         ) : (
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 22, textAlign: "center", marginBottom: 16 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 32, textAlign: "center", marginBottom: 24, textTransform: "uppercase" }}>
             {nextEvent.mainEvent ?? nextEvent.name}
           </div>
         )}
 
-        {/* Date / venue bar */}
+        {/* Info Block */}
         <div style={{
-          padding: "10px 14px",
-          background: "rgba(0,0,0,0.5)",
-          borderRadius: 10,
-          display: "flex", justifyContent: "center", gap: 12,
-          fontSize: 11, color: "var(--color-text-muted)",
-          fontFamily: "var(--font-display)", fontWeight: 600,
-          marginBottom: 16, flexWrap: "wrap", textAlign: "center",
+          width: "100%", padding: "16px",
+          background: "var(--neutral-900)", border: "2px solid var(--color-border)",
+          display: "flex", justifyContent: "center", gap: 16,
+          fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase",
+          marginBottom: 24, flexWrap: "wrap", textAlign: "center"
         }}>
-          <span>📅 {new Date(nextEvent.date).toLocaleDateString("es-EC", { day: "numeric", month: "long", year: "numeric" })}</span>
+          <span style={{ color: "var(--color-primary)" }}>FECHA // {new Date(nextEvent.date).toLocaleDateString("es-EC")}</span>
           <span style={{ color: "var(--color-border)" }}>|</span>
-          <span>📍 {nextEvent.city}</span>
-          <span style={{ color: "var(--color-border)" }}>|</span>
-          <span>{nextEvent.venue}</span>
+          <span style={{ color: "white" }}>LUGAR // {nextEvent.city} - {nextEvent.venue}</span>
         </div>
 
         {/* CTA buttons */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <button className="btn-primary" style={{
-            padding: "13px 10px", fontSize: 12, fontWeight: 900,
-            letterSpacing: "0.04em", lineHeight: 1.2,
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, width: "100%" }}>
+          <button style={{
+            padding: "16px", background: "var(--color-primary)", border: "4px solid var(--color-text)",
+            color: "white", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer",
+            textTransform: "uppercase", boxShadow: "4px 4px 0px rgba(0,0,0,0.5)"
           }}>
-            🎟️ COMPRAR<br />ENTRADAS
+            COMPRAR ENTRADAS DIRECTAS
           </button>
-          <button className="btn-secondary" style={{
-            padding: "13px 10px", fontSize: 12, display: "flex",
-            alignItems: "center", justifyContent: "center", gap: 6,
+          <button style={{
+            padding: "16px", background: "transparent", border: "4px solid var(--color-text)",
+            color: "var(--color-text)", fontFamily: "var(--font-display)", fontSize: 20, cursor: "pointer",
+            textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 8
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
-            </svg>
-            VER PPV
+            <Image src="/icon_stadium.png" alt="PPV" width={24} height={24} /> VER PPV
           </button>
         </div>
       </div>
@@ -182,134 +154,103 @@ function ProximoEventoHero() {
 
 /* ─── Main Page ─────────────────────────────────────────── */
 export default function EventsPage() {
+  const { user } = useAuth();
   const [calView, setCalView] = useState<"upcoming" | "completed">("upcoming");
   const filtered = events.filter(e => calView === "upcoming" ? e.status !== "completed" : e.status === "completed");
 
   return (
-    <div style={{ background: "var(--color-bg)", minHeight: "100dvh", paddingBottom: 80 }}>
-      <TopBar title="Ligas y Torneos" />
-
+    <AppShell role={user?.role || "normal"}>
       {/* ── Header ── */}
-      <div style={{ padding: "20px 20px 0", background: "linear-gradient(180deg, #1a0505 0%, var(--color-bg) 100%)" }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 26, letterSpacing: "-0.03em", marginBottom: 16 }}>
-          📅 THE CIRCUIT
+      <div style={{ padding: "40px 20px 20px", background: "var(--color-surface)", borderBottom: "4px solid var(--color-primary)" }}>
+        <h1 style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-display)", fontSize: 48, letterSpacing: "2px", lineHeight: 1, textTransform: "uppercase", marginBottom: 32 }}>
+          <Image src="/icon_stadium.png" alt="Circuit" width={48} height={48} /> LUGARES DE PODER
         </h1>
 
         {/* ── Hero: Próximo Evento ── */}
         <ProximoEventoHero />
 
         {/* ── LIGAS PROVINCIALES ── */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-            <div className="section-heading" style={{ fontSize: 13 }}>LIGAS PROVINCIALES</div>
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "0.06em", cursor: "pointer" }}>
-              VER TODAS →
-            </span>
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase" }}>LIGAS PROVINCIALES ACTIVAS</div>
           </div>
           <div style={{
-            display: "flex", gap: 10,
-            overflowX: "auto", paddingBottom: 8, paddingTop: 4,
-            scrollbarWidth: "none",
-            marginLeft: -20, marginRight: -20,
-            paddingLeft: 20, paddingRight: 20,
+            display: "flex", gap: 16, overflowX: "auto", paddingBottom: 16,
+            scrollbarWidth: "none", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20,
           }}>
             {provincialLeagues.map(l => <HexLeagueCard key={l.id} league={l} />)}
           </div>
         </div>
 
-        {/* ── Calendar section header ── */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 0 }}>
-          <div className="section-heading" style={{ fontSize: 14 }}>CALENDARIO</div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 11, color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "0.06em", cursor: "pointer" }}>
-            VER TODOS →
-          </span>
-        </div>
-
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--color-border)", marginTop: 12 }}>
-          {([["upcoming", "Próximos"], ["completed", "Resultados"]] as const).map(([key, label]) => (
+        <div style={{ display: "flex", gap: 16, borderBottom: "2px solid var(--color-border)" }}>
+          {([["upcoming", "CARTELERAS PRÓXIMAS"], ["completed", "RESULTADOS PASADOS"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => setCalView(key)} style={{
-              padding: "9px 18px", border: "none", background: "none", cursor: "pointer",
-              fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12,
-              textTransform: "uppercase", letterSpacing: "0.06em",
-              color: calView === key ? "var(--color-primary)" : "var(--color-text-muted)",
-              borderBottom: calView === key ? "2px solid var(--color-primary)" : "2px solid transparent",
-              marginBottom: -1,
+              padding: "12px 24px", border: "none", background: calView === key ? "var(--color-text)" : "transparent",
+              cursor: "pointer", fontFamily: "var(--font-display)", fontSize: 16, textTransform: "uppercase",
+              color: calView === key ? "var(--color-bg)" : "var(--color-text-muted)",
+              transform: calView === key ? "translateY(2px)" : "none",
+              borderTopLeftRadius: 0, borderTopRightRadius: 0
             }}>{label}</button>
           ))}
         </div>
       </div>
 
       {/* ── Calendar list ── */}
-      <main style={{ padding: "12px 16px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {filtered.map((event) => {
-            const dateObj = new Date(event.date);
-            const dayNum = dateObj.getDate();
-            const monthStr = dateObj.toLocaleDateString("es-EC", { month: "short" }).toUpperCase();
-
-            return (
-              <div key={event.id} style={{
-                display: "flex", alignItems: "stretch", gap: 0,
-                background: "var(--card-bg)",
-                borderRadius: 14, border: "1px solid var(--card-border)",
-                overflow: "hidden", cursor: "pointer",
-                transition: "border-color 0.2s",
-              }}>
-                {/* Date block — parallelogram cut right edge */}
-                <div style={{
-                  flexShrink: 0, width: 64,
-                  background: "var(--color-primary)",
-                  display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center",
-                  padding: "14px 6px",
-                  clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%)",
+      <main style={{ padding: "40px 16px" }}>
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--color-text-muted)", background: "var(--color-surface)", border: "4px dashed var(--color-border)" }}>
+            <Image src="/icon_stadium.png" width={48} height={48} alt="Empty" style={{ opacity: 0.5, marginBottom: 16 }} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 24, textTransform: "uppercase" }}>EL CALENDARIO ESTÁ VACÍO</div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            {filtered.map((event) => {
+              const dateObj = new Date(event.date);
+              const dayNum = dateObj.getDate();
+              const monthStr = dateObj.toLocaleDateString("es-EC", { month: "short" }).toUpperCase();
+              return (
+                <div key={event.id} style={{
+                  padding: "20px", background: "var(--color-surface)",
+                  border: "4px solid var(--color-text)",
+                  display: "flex", gap: 20, alignItems: "stretch",
+                  boxShadow: "4px 4px 0px rgba(255,255,255,0.1)"
                 }}>
-                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 26, lineHeight: 1, color: "white" }}>{dayNum}</div>
-                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 10, color: "rgba(255,255,255,0.8)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{monthStr}</div>
-                </div>
+                  {/* Hard Date box */}
+                  <div style={{
+                    width: 72, background: "var(--color-bg)", border: "2px solid var(--color-border)",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: 14, color: "var(--color-primary)", textTransform: "uppercase" }}>{monthStr}</span>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: 36, lineHeight: 1, color: "white" }}>{dayNum}</span>
+                  </div>
 
-                {/* Event info */}
-                <div style={{ flex: 1, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                  <div>
-                    <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap", alignItems: "center" }}>
-                      <span className="badge-para" style={{ fontSize: 9, padding: "3px 10px 3px 8px" }}>{event.type}</span>
-                      {event.status === "live" && <span className="live-dot" />}
+                  <div style={{ flex: 1, padding: "8px 0" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
+                      <span style={{ background: typeColors[event.type] || "var(--color-text)", color: typeColors[event.type] ? "white" : "var(--color-bg)", padding: "2px 8px", fontFamily: "var(--font-display)", fontSize: 12, textTransform: "uppercase" }}>{event.type}</span>
+                      {event.status === "live" && (
+                        <span style={{ color: "var(--color-primary)", fontFamily: "var(--font-display)", fontSize: 14, textTransform: "uppercase", animation: "pulse 2s infinite" }}>EN VIVO AHORA</span>
+                      )}
                     </div>
-                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 15, lineHeight: 1.2, marginBottom: 3 }}>
-                      {event.name}
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
-                      {event.city}, {event.venue}
-                    </div>
+                    
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 24, lineHeight: 1.1, textTransform: "uppercase", marginBottom: 8 }}>{event.name}</div>
+                    
                     {event.mainEvent && (
-                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                        ⚔️ {event.mainEvent}
+                      <div style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 14, color: "var(--color-primary)", marginBottom: 8, textTransform: "uppercase" }}>
+                        MAIN EVENT // {event.mainEvent}
                       </div>
                     )}
-                  </div>
-
-                  {/* Arrow chevron */}
-                  <div style={{ color: "var(--color-primary)", flexShrink: 0 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M9 18l6-6-6-6"/>
-                    </svg>
+                    
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 14, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                      {event.city} · {event.venue} // {event.fights.length} PELEAS PRELIMINARES
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-
-          {filtered.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--color-text-muted)" }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>📅</div>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15 }}>Sin eventos</div>
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }
